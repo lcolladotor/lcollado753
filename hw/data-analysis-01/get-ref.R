@@ -6,5 +6,6 @@ apply(ref, 1, function(x) {
 	download.file(x[1], destfile = x[2])
 })
 
+## Save info
 dateDownloaded <- date()
 save.image("raw-ref.Rdata")
