@@ -199,6 +199,7 @@ win &lt;- xpathSApply(html3, &quot;//li[@class=&#39;game-status win&#39;] | //li
 score &lt;- xpathSApply(html3, &quot;//li[@class=&#39;score&#39;]&quot;, xmlValue)
 where &lt;- xpathSApply(html3, &quot;//li[@class=&#39;game-status&#39;]&quot;, xmlValue)
 team &lt;- xpathSApply(html3, &quot;//li[@class=&#39;team-name&#39;]&quot;, xmlValue)
+## From James and Jiawei
 dates &lt;- xpathSApply(html3, &quot;//tr[contains(@class,&#39;row team&#39;)]/td[2]&quot;, xmlValue)
 
 
@@ -250,7 +251,7 @@ xpathSApply(html3, &quot;//ul[@class=&#39;game-schedule&#39;]&quot;, xmlValue)
 dateDownloaded
 </code></pre>
 
-<pre><code>## [1] &quot;Tue Feb  5 17:48:32 2013&quot;
+<pre><code>## [1] &quot;Tue Feb  5 17:50:30 2013&quot;
 </code></pre>
 
 <pre><code class="r">save(data, dateDownloaded, file = &quot;raw.Rdata&quot;)

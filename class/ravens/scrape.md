@@ -24,6 +24,7 @@ win <- xpathSApply(html3, "//li[@class='game-status win'] | //li[@class='game-st
 score <- xpathSApply(html3, "//li[@class='score']", xmlValue)
 where <- xpathSApply(html3, "//li[@class='game-status']", xmlValue)
 team <- xpathSApply(html3, "//li[@class='team-name']", xmlValue)
+## From James and Jiawei
 dates <- xpathSApply(html3, "//tr[contains(@class,'row team')]/td[2]", xmlValue)
 
 
@@ -86,7 +87,7 @@ dateDownloaded
 ```
 
 ```
-## [1] "Tue Feb  5 17:48:32 2013"
+## [1] "Tue Feb  5 17:50:30 2013"
 ```
 
 ```r
