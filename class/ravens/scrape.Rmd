@@ -20,9 +20,11 @@ win <- xpathSApply(html3, "//li[@class='game-status win'] | //li[@class='game-st
 score <- xpathSApply(html3, "//li[@class='score']", xmlValue)
 where <- xpathSApply(html3, "//li[@class='game-status']", xmlValue)
 team <- xpathSApply(html3, "//li[@class='team-name']", xmlValue)
+dates <- xpathSApply(html3, "//tr[contains(@class,'row team')]/td[2]",xmlValue)
+
 
 ## Group into a data.frame
-data <- data.frame(Win = win, Score = score, Where = where, Team = team)
+data <- data.frame(Win = win, Score = score, Where = where, Team = team, Date = dates)
 data
 ```
 
