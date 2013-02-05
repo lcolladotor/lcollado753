@@ -1,0 +1,114 @@
+% Document type and font specification
+\documentclass[11pt]{article}
+
+% Margin specification
+% Check http://en.wikibooks.org/wiki/LaTeX/Page_Layout for more info
+\usepackage[margin = 1in]{geometry}
+\usepackage[nottoc,notlof,notlot,numbib]{tocbibind}
+
+% Some misc and math packages
+% Check http://en.wikibooks.org/wiki/LaTeX/Mathematics for more info
+\usepackage{fancyhdr}
+\usepackage{manfnt}
+\usepackage{pgf}
+\usepackage{amsmath,amsthm,amssymb,natbib,graphicx}
+\usepackage{amsfonts}
+\DeclareMathAlphabet{\mathpzc}{OT1}{pzc}{m}{it}
+\usepackage{bbm}
+\usepackage{float}
+\usepackage{mathrsfs} %mathscr{A}
+\usepackage{hyperref,graphicx}
+
+% Color
+\usepackage{color}
+
+% For specifying the counter style of enumerate
+\usepackage{enumerate}
+
+% Page style definition
+\pagestyle{fancy}
+% Customize this to your liking.
+\lhead{}\chead{}\rhead{By \myurlshort{http://biostat.jhsph.edu/~lcollado/}{L. Collado-Torres}}\lfoot{}\cfoot{\thepage}\rfoot{\today}
+
+% Line space
+\usepackage{setspace}
+% Default is normal, but un-comment below to your liking
+% \onehalfspacing
+% \doublespacing
+
+% Caption and figure def
+% Check http://en.wikibooks.org/wiki/LaTeX/Floats,_Figures_and_Captions for more info
+\usepackage[font=small,labelfont=bf]{caption}
+\usepackage{wrapfig}
+
+% Math theorems shortcuts
+% Check http://en.wikibooks.org/wiki/LaTeX/Theorems for more info
+\usepackage{mathtools}
+\newtheorem{thm}{Theorem}
+\newtheorem{lem}{Lemma}[thm]
+\newtheorem{cor}{Corollary}[thm]
+\newtheorem{defi}{Definition}
+\newtheorem{conj}{Conjecture}
+\newtheorem{prop}{Proposition}
+\newtheorem{ex}{Example}
+\newtheorem{claim}{Claim}
+\newtheorem{fact}{Fact}
+\renewcommand{\qedsymbol}{$\blacksquare$}
+
+% Some inherited commands
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
+\newcommand{\myurlshort}[2]{\href{#1}{\textcolor{gray}{\textsf{#2}}}}
+
+% knitr options
+<<setup, include=FALSE, cache=FALSE>>=
+# set global chunk options
+opts_chunk$set(fig.path='fig-', fig.align='center', fig.show='hold', fig.width=7, fig.height=7, out.width='.8\\linewidth')
+options(width=90)
+@
+
+
+\begin{document}
+
+%\begin{titlepage}
+\begin{center}
+
+% Actual title
+{ \bfseries Project proposal}\\%[0.3cm]
+\textsc{Advanced Methods III 140.753}\\
+\normalsize
+\end{center}
+% \end{titlepage}
+
+%%%%%%%%%% Write document %%%%%%%%%%%%%%
+As a project for this class, 140.753, I'm interested in learning more about the statistics methods and concepts that have been applied to both NFL and NBA players\footnote{I figured that the project should have nothing to do wiht our research to promote that \emph{you can do it!} attitude.}. I believe that others have tried to de-mistify the games and explain numerically what others justify with intuition. One great example is what Brian Burke has been doing at Advanced NFL Stats, including a compilation of play-by-play data for the last 10 years at \url{http://www.advancednflstats.com/2010/04/play-by-play-data.html}. On a more sparce level, Rafael Irizarry has made some interesting points regarding basketball players at \url{http://simplystatistics.org/tag/basketball/} including his latest piece regarding how Kobe's ball hogging affects the Lakers.
+
+As we saw in class [lecture 003], a good project leads with the question. At first I thought of trying to explain what made the Baltimore Ravens win over the New England Patriots at the AFC championship of the 2012 season so special in terms of reflecting the so-called \emph{intangibles}. My other main interest is comparing the characteristics of the game at half time versus all other half-time games from the Patriots and other teams. After all, was it really special that the Patriots were 67-0 when leading at half time? If I had to guess, the facts that it was a low scoring game half way through with a small difference in points surely gave the Ravens a strong chance of winning.
+
+I have to admit that my knowledge of sports sabermetrics is quite limited. For instance, after reading \myurlshort{http://www.advancednflstats.com/2007/07/what-makes-teams-win-part-1.html}{What Makes Teams Win?} [4 part story], I think that the effect of the \emph{intangibles} is going to be very hard to describe. After all, Brian Burke did an analysis of \myurlshort{http://www.advancednflstats.com/2013/01/best-games-of-2012-and-best-playoff.html}{Best Games of 2012 and Best Playoff Games} using what he has defined as the \emph{excitement index} (EI) and the \emph{comeback factor} (CBF) which showed that the AFC championship was not so special as can been seen in \url{http://wp.advancednflstats.com/nflarchive.php?gameid=55834}. To further highlight Brian Burke, I liked his new piece on \myurlshort{http://www.advancednflstats.com/2013/01/whos-clutchiest-post-season-qb.html}{Who's the Clutchiest Post-Season QB?} where I was fairly surprised by Brett Favre's (obviously one of the best QB ever!!) outlier position (see the \emph{All Years} tab). This piece also highlights to me why it is important to make interactive graphs for this kind of results. Anyone looking at it, and with some knowledge of the game, will want to find their player of interest or change some parameters like the year in question.
+
+I'm aware that previously other students have played around with sports data. Namely, Lei Huang, Prasad Patil and Therri Usher. Therefore, my project proposal is the following one.
+
+\begin{itemize}
+	\item Further understand current sabermetrics knowledge. For example, the \emph{Winning Probability} and \emph{Expected Points Added} which are so heavily used by Brian Burke.
+	\item Learn what other students tried in the past and learn from their experiences.
+	\item Define a specific question of interest.
+	\item Get going with the project! Aka, gather data, pre-process, explore, analyze, conclude.
+	\item Make an interactive report using (if possible) some of the latest tools such as the \myurlshort{http://www.rstudio.com/shiny/}{Shiny} web application server made by the people at RStudio. Preferrably, using ggplot2\footnote{I'm interested in learning how to use ggplot2 and have ordered 2 books on the subject. Seems like it already displaced \texttt{lattice}.} as the graphics device (it is \myurlshort{http://www.stanford.edu/~cengel/cgi-bin/anthrospace/building-my-first-shiny-application-with-ggplot}{possible}) to make the plots look neat.
+\end{itemize}
+
+
+
+% For references, uncomment and remember to use the following series
+% when compling the pdf:
+% R Sweave, pdflatex, bibtex, pdflatex, pdflatex, open pdf
+% \bibliographystyle{plain}
+% \bibliography{biblio}
+
+% Uncomment if you want to add the R session information
+%\tiny
+%<<info, results='asis', echo = FALSE>>=
+%toLatex(sessionInfo())
+%@
+
+
+\end{document}

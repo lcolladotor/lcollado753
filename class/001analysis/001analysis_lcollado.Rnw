@@ -1,0 +1,302 @@
+% Document type and font specification`
+\documentclass[11pt]{article}
+
+% Margin specification
+% Check http://en.wikibooks.org/wiki/LaTeX/Page_Layout for more info
+\usepackage[margin = 1in]{geometry}
+\usepackage[nottoc,notlof,notlot,numbib]{tocbibind}
+
+% Some misc and math packages
+% Check http://en.wikibooks.org/wiki/LaTeX/Mathematics for more info
+\usepackage{fancyhdr}
+\usepackage{manfnt}
+\usepackage{pgf}
+\usepackage{amsmath,amsthm,amssymb,natbib,graphicx}
+\usepackage{amsfonts}
+\DeclareMathAlphabet{\mathpzc}{OT1}{pzc}{m}{it}
+\usepackage{bbm}
+\usepackage{float}
+\usepackage{mathrsfs} %mathscr{A}
+\usepackage{hyperref,graphicx}
+
+% Color
+\usepackage{color}
+
+% For specifying the counter style of enumerate
+\usepackage{enumerate}
+
+% Page style definition
+\pagestyle{fancy}
+% Customize this to your liking.
+\lhead{}\chead{}\rhead{By \myurlshort{http://biostat.jhsph.edu/~lcollado/}{L. Collado-Torres}}\lfoot{}\cfoot{\thepage}\rfoot{\today}
+
+% Line space
+\usepackage{setspace}
+% Default is normal, but un-comment below to your liking
+% \onehalfspacing
+% \doublespacing
+
+% Caption and figure def
+% Check http://en.wikibooks.org/wiki/LaTeX/Floats,_Figures_and_Captions for more info
+\usepackage[font=small,labelfont=bf]{caption}
+\usepackage{wrapfig}
+
+% Math theorems shortcuts
+% Check http://en.wikibooks.org/wiki/LaTeX/Theorems for more info
+\usepackage{mathtools}
+\newtheorem{thm}{Theorem}
+\newtheorem{lem}{Lemma}[thm]
+\newtheorem{cor}{Corollary}[thm]
+\newtheorem{defi}{Definition}
+\newtheorem{conj}{Conjecture}
+\newtheorem{prop}{Proposition}
+\newtheorem{ex}{Example}
+\newtheorem{claim}{Claim}
+\newtheorem{fact}{Fact}
+\renewcommand{\qedsymbol}{$\blacksquare$}
+
+% Some inherited commands
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
+\newcommand{\myurlshort}[2]{\href{#1}{\textcolor{gray}{\textsf{#2}}}}
+
+% knitr options
+<<setup, include=FALSE, cache=FALSE>>=
+# set global chunk options
+opts_chunk$set(fig.path='fig-', fig.align='center', fig.show='hold', fig.width=7, fig.height=7, out.width='.8\\linewidth')
+options(width=90)
+@
+
+
+\begin{document}
+
+%\begin{titlepage}
+\begin{center}
+
+% Actual title
+{ \bfseries 001inclass}\\%[0.3cm]
+\textsc{Advanced Methods III 140.753}\\
+\normalsize
+\end{center}
+% \end{titlepage}
+
+%%%%%%%%%% Write document %%%%%%%%%%%%%%
+<<load, out.width='.6\\linewidth', fig.cap='Initial exploration of the data'>>=
+
+## Load data
+load("trainData.rda")
+
+## Initial exploration
+length(trainData)
+trainData[[1]][, 1:10]
+trainData[[2]][, 1:10]
+
+par(mfrow=c(1,2))
+plot(trainData[[1]][1,], trainData[[1]][2,])
+plot(trainData[[1]][1,])
+@
+
+The goal is to predict variable 1 at time points 18, 19 and 20.
+
+<<summarize, fig.cap='Simple heatmap of the summarized data. Created with default params.'>>=
+
+### Summarize information according to the method I submitted
+mat <- matrix(NA, ncol = 50, nrow = ncol(trainData[[1]]))
+for(k in 1:ncol(trainData[[1]])) {
+	for(i in 1:length(trainData)) {
+		if(k == 1) {
+			cols <- which(trainData[[i]][1,] <= trainData[[1]][1, k])
+		} else{
+			cols <- which(trainData[[i]][1,] <= trainData[[1]][1, k] & trainData[[i]][1, ] > trainData[[1]][1, k-1] )
+		}
+		if(length(cols) > 0) {
+			mat[k, i] <- mean(trainData[[i]][2, cols])
+		} else {
+			mat[k, i] <- NA
+		}
+	}
+}
+
+## Explore summary of info
+## summary(mat) ## Quite big, so I'm just going to show the first 4
+summary(mat[, 1:4])
+heatmap(mat)
+@
+
+<<exploreV1, fig.cap='Exploring V1'>>=
+
+## explore V1
+qqnorm(trainData[[1]][2,])
+qqline(trainData[[1]][2,])
+@
+
+From figure \ref{fig:exploreV1} it seems that it is reasonable to claim that it follows a normal distribution and thus could use \texttt{lm}.
+
+<<impute>>=
+## Impute using column means. 
+mat2 <- mat
+for(i in 1:ncol(mat)) {
+	mat2[is.na(mat[,i]), i] <- mean(mat[,i], na.rm = TRUE)
+}
+
+## Then fit a lm
+colnames(mat2) <- paste("V", 1:ncol(mat2), sep="")
+mat2 <- data.frame(mat2)
+fit <- lm(V1 ~ ., data = mat2[1:17,])
+summary(fit)
+## Results are... horrible.
+@
+
+Ok, time to take a different angle. First, I'll re-organize the data, then explore it and see what idea comes up.
+
+<<>>=
+
+
+## Re-order the data in a data.frame
+time <- sort(unique(unlist(lapply(trainData, function(x) { 
+	x[1, ]
+}))))
+df <- data.frame(time)
+df <- cbind(df, matrix(NA, nrow=nrow(df), ncol=length(trainData)))
+colnames(df) <- c("time", paste("V", 1:length(trainData), sep=""))
+for(i in 1:length(trainData)){
+	var <- paste("V", i, sep="")
+	df[which(time %in% trainData[[i]][1, ]), var] <- trainData[[i]][2, ] 
+	## The previous step assumes that the data is time-sorted
+}
+
+
+## Exploring the relationship between the variables taking time into account
+
+## First, V1 and V2
+plot(df$time, df$V1, type="o", col="red")
+i <- 2
+var <- paste("V", i, sep="")
+lines(df$time, df[, var], type="o", col="light blue", cex = 0.5)
+
+## Now: V1, V2 and V3
+plot(df$time, df$V1, type="o", col="red")
+for(i in 2:3){
+	var <- paste("V", i, sep="")
+	lines(df$time, df[, var], type="o", col=c(NA, "light blue", "orange")[i], cex = 0.5)
+}
+
+## All of them
+plot(df$time, df$V1, type="o", col="red")
+for(i in 2:length(trainData)){
+	var <- paste("V", i, sep="")
+	lines(df$time, df[, var], type="o", col="light blue", cex = 0.5)
+}
+
+
+
+@
+
+From the previous plots, now I want to try using something related to \emph{workers}. The idea is to have a function that takes as input the variable number ($i in 2, 3, \ldots, 50$) and the time $t$. I'll use the times where I have data from variable 1 to create a complete data set. Then, using that set I'll try to predict the values for variable one for $t = 18, 19, 20$. Note that for that I'll use the function to predict the values for the other variables at the same time points before predicting the value of variable 1.
+
+It sounds like lots of prediction is involved and could be a rather fragile method. Hopefully it'll produce better results that my first approach.
+
+<<splines, fig.keep='high, fig.cap='Exploring what df parameter to use for the natural splines function ns'>>=
+
+## Will use splines for the vars 2, 3, ..., 50
+library(splines)
+
+## Determine the actual number of splines
+## Note that I don't mind overfitting if it means that each
+## model for a specific var will have less bias since I will in a way average
+## them at the end
+
+par(mfrow=c(2,3))
+for(n in c(2, 3, 6, 8, 10, 12)){
+	print(paste("Using df equal to", n))
+	fitV2 <- lm(V2 ~ bs(time, df = n), data = df)
+	print(summary(fitV2))
+	print("*******************")
+	newV2 <- seq(0, 20, length.out=300)
+
+	plot(df$time, df$V2, type="o", main=paste("df equal", n), xlim = c(0,20))
+	lines(newV2, predict(fitV2, data.frame(time=newV2)))
+}
+
+@
+
+From figure \ref{fig:splines} I decided to use \texttt{df} $= 10$ in the \texttt{bs} call. Other exploration releaved that using \texttt{ns} instead of \texttt{bs} produced poor results. 
+
+<<getSplines>>=
+
+## Create models for vars 2, 3, ..., 50
+findT <- df$time[!is.na(df$V1)]
+splineFits <- lapply(2:50, function(j) {
+	var <- paste("V", j, sep="")
+	lm(df[, var] ~ bs(time, df = 10), data = df)
+})
+splineT <- lapply(splineFits, function(x) {
+	predict(x, data.frame(time=findT))
+})
+
+## Make complete data frame
+comp <- data.frame(time = findT, V1 = df$V1[!is.na(df$V1)])
+comp <- cbind(comp, matrix(NA, nrow=nrow(comp), ncol=length(splineT)))
+colnames(comp) <- c("time", paste("V", 1:length(trainData), sep=""))
+for(i in 1:length(splineT)){
+	comp[, i+2] <- splineT[[i]]
+}
+
+fitIdea2 <- lm(V1 ~ ., data = comp)
+summary(fitIdea2)
+
+## Seems like only V2 to V10 are usable
+## Further exploration reveals that this is directly related to the df paramater
+
+## Re-adjust model
+fitIdea2.b <- lm(V1 ~ time + V2 + V3 + V4 + V5 + V6 + V7 + V8 + V9 + V10, data = comp) # 
+step(fitIdea2.b) ## Could try to variable select
+## Note how it removed the time variable
+summary(fitIdea2.b)
+## Ok, good to go
+@
+
+<<predict>>=
+
+## First, make the predictions for V2, V3, ... for times 18, 19 and 20.
+topred <- data.frame(time = c(18, 19, 20))
+splinePred <- lapply(splineFits, function(x) {
+	predict(x, topred)
+})
+
+## Re-organize results in a data.frame similar to comp
+compPred <- data.frame(time = topred$time)
+compPred <- cbind(compPred, matrix(NA, nrow=nrow(compPred), ncol=length(splinePred)))
+colnames(compPred) <- c("time", paste("V", 2:length(trainData), sep=""))
+for(i in 1:length(splinePred)){
+	compPred[, i+1] <- splinePred[[i]]
+}
+
+## Make predictions for V1
+(predV1 <- predict(fitIdea2.b, compPred))
+
+## The splines do not seem to be working for time points 18, 19, 20 because the V2, ..., V10 have values outside the -1, 1 range.
+summary(comp[, 3:11])
+summary(compPred[, 2:10])
+@
+
+In conclusion, this method mostly failed. It is note realizing that using a step variable selection would remove the \texttt{time} variable. Plus, there are plenty of warnings from using \texttt{bs} to predict the V2, \ldots, V50 values noting that there are $x$ values beyond the boundary knots. For this idea to work, I would need to improve the prediction of the values for V2, \ldots, V50 for values outside the boundaries. 
+
+Anyhow, I think that this is more than enough for an in-class exercise!
+
+
+
+
+% For references, uncomment and remember to use the following series
+% when compling the pdf:
+% R Sweave, pdflatex, bibtex, pdflatex, pdflatex, open pdf
+% \bibliographystyle{plain}
+% \bibliography{biblio}
+
+% Uncomment if you want to add the R session information
+%\tiny
+<<info, results='asis', echo = FALSE>>=
+toLatex(sessionInfo())
+@
+
+
+\end{document}
