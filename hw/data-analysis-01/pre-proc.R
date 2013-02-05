@@ -16,6 +16,7 @@ url$file[12] <- "RD_501_44201_2004.zip"
 
 ## Download the zip files
 apply(url, 1, function(x) { download.file(x[1], destfile = x[2]) })
+dateDownloaded <- date()
 
 ## Extract zip files
 sapply(url$file, unzip)
@@ -60,24 +61,28 @@ getHeader <- function(file, df = NULL, colClasses = NULL) {
 }
 
 ## Testing getHeader
-oz <- read.table("Oz2012.txt", sep="|")
-tmp <- getHeader("Oz2012.txt")
-## Works =)
-head(tmp)
+if(FALSE) {
+	oz <- read.table("Oz2012.txt", sep="|")
+	tmp <- getHeader("Oz2012.txt")
+	## Works =)
+	head(tmp)
 
-pm <- getHeader("RD_501_88101_2003-0.txt")
-print(object.size(pm), units="Mb")
+	pm <- getHeader("RD_501_88101_2003-0.txt")
+	print(object.size(pm), units="Mb")
+}
 
 
 ## Loading data and saving it in an Rdata file
 raw <- lapply(list.files(pattern="txt"), getHeader)
 names(raw) <- list.files(pattern="txt")
 print(object.size(raw), units="Mb")
-save(raw, file="raw.Rdata", compress="bzip2")
+## 18809.4 Mb
 
 
-## Get reference tables
-ref <- data.frame(name = c("Units", "StatesAndCounty", "Collection", "Duration"), url = c("https://aqs.epa.gov/aqsweb/codes/data/Units.csv", "https://aqs.epa.gov/aqsweb/codes/data/StateCountyCodes.csv", "https://aqs.epa.gov/aqsweb/codes/data/CollectionFrequencies.csv", "https://aqs.epa.gov/aqsweb/codes/data/SampleDurationCodes.csv"), file = c("Units.csv", "StateCountyCodes.csv", "CollectionFrequencies.csv", "SampleDurationCodes.csv"))
+## The save() would break (lack of mem), probably because of the compression
+## save(raw, dateDownloaded, file="raw.Rdata", compress="bzip2")
+save.image("raw-image.Rda")
+
 
 
 
