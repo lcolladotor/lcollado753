@@ -44,6 +44,7 @@ getHeader <- function(file, df = NULL, colClasses = NULL) {
 	call <- paste0("wc -l ", file, "| cut -d '", substr(file, 1, 1), "' -f1")
 	lines <- as.numeric(system(call, intern = TRUE))
 	
+	## Read in data.frame
 	if(ncols[i] == 28 && is.null(colClasses)) {
 		res <- read.table(file, sep="|", nrows = lines + 2, col.names = extract[[i]], colClasses = c(rep("character", 12), "numeric", rep("character", 13), rep("numeric", 2)))
 	} else if (!is.null(colClasses)){
@@ -51,6 +52,8 @@ getHeader <- function(file, df = NULL, colClasses = NULL) {
 	} else{
 		res <- read.table(file, sep="|", nrows = lines + 2, col.names = extract[[i]])	
 	}
+	
+	## Format the dates
 	if("Date" %in% colnames(res)) {
 		res$Date <- as.Date(res$Date, format="%Y%m%d")
 	}
@@ -77,6 +80,8 @@ raw <- lapply(list.files(pattern="txt"), getHeader)
 names(raw) <- list.files(pattern="txt")
 print(object.size(raw), units="Mb")
 ## 18809.4 Mb
+
+## Note the big memory size of the raw object. 
 
 
 ## The save() would break (lack of mem), probably because of the compression
