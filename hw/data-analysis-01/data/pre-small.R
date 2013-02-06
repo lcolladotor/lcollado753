@@ -46,3 +46,34 @@ print(object.size(pre), units="Mb")
 ## Save the object
 save(pre, file="pre-small.Rdata")
 
+### To later load the file remember to first 
+## library(IRanges)
+
+## Example of what you can do
+if(FALSE) {
+	library(IRanges)
+	
+	## Load
+	load("raw-basic.Rdata")
+	load("pre-small.Rdata")
+}
+
+## Mean by state for entry 1
+tapply(pre[[1]]$Value, pre[[1]]$State, mean, na.rm = TRUE)
+	
+## Map entry with url table
+map <- sapply(gsub("-0.txt", "", names(pre)), function(x) { grep(x, url$file) })
+	
+## Mean by state with year, type for all entries
+means <- lapply(1:length(pre), function(i) {
+	x <- pre[[i]]
+	y <- tapply(x$Value, x$State, mean, na.rm = TRUE)
+	data.frame(Mean = y, State = names(y), type = factor(url$type[map[i]]), year = url$year[map[i]], stringsAsFactors = FALSE)
+})
+means.df <- do.call(rbind, means)
+rownames(means.df) <- 1:nrow(means.df)
+dim(means.df)
+#1065    4
+head(means.df)
+save(means.df, map, file = "example-means.Rdata")
+## Note that this previous example is incomplete because I have yet to fix the values according to the Units used.
