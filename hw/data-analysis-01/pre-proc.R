@@ -81,8 +81,48 @@ print(object.size(raw), units="Mb")
 
 ## The save() would break (lack of mem), probably because of the compression
 ## save(raw, dateDownloaded, file="raw.Rdata", compress="bzip2")
-save.image("raw-image.Rda")
+save.image("raw-image.Rdata")
+save(url, dateDownloaded, file="raw-basic.Rdata")
 
+## Exploring the data
+if(FALSE) {
+	max(unlist(lapply(raw, nrow)))
+	## 9325064 ## It's Ozone, 2011
+	summary(as.factor(raw[[9]][, "Qualifier...1"]))
+	#              1       2       3       9      IE      IL      IM      IO      IP 
+	#9309078     413    7235     392    1571    1136      30       3      67       1 
+	#     IT      RG      RL      RM      RO      RT      VB 
+	#     91      71     118     287     672     478    3421 
+	15986 / ( 15986 + 9309078) * 100
+	#0.1714305
+	## Very low percent is non-NA. 
+	lapply(raw, function(x) { summary(as.factor(x$RD))}) ## All RD
+	lapply(raw, function(x) { summary(as.factor(x$Action.Code))}) ## All I
+	## State.Code, keep
+	## County.Code, keep
+	## Site.ID, keep
+	lapply(raw, function(x) { summary(as.factor(x$Parameter))}) ## Either 44201 or 88101.
+	lapply(raw, function(x) { summary(as.factor(x$POC))}) ## Up to 9 values. No NAs. Keep
+	lapply(raw, function(x) { summary(as.factor(x$Sample.Duration))}) ## Mostly 7, some 1. Doesn't seem like it'll be useful.
+	lapply(raw, function(x) { summary(as.factor(x$Unit))}) ## Up to 3 per file, 5 types in total. Keep
+	lapply(raw, function(x) { summary(as.factor(x$Method))}) ## No NA's, and varied information. Keep
+	## Date, keep
+	## Start.Time, keep
+	## Sample.Value, keep
+	lapply(raw, function(x) { summary(as.factor(x$Null.Data.Code))}) ## Majority is NA, but some have 20k+ elements. Could use a logical here just to keep track of whether there is a code or not since they seem important from https://aqs.epa.gov/aqsweb/codes/data/QualifierCodes_0_A.html
+	lapply(raw, function(x) { summary(as.factor(x$Sampling.Frequency))}) ## All NA for Ozone. PM is mostly NA with some 30k+ This data seems redundant with Date and Start.Time from reading https://aqs.epa.gov/aqsweb/codes/data/CollectionFrequencies.html
+	lapply(raw, function(x) { summary(as.factor(x$Monitor.Protocol..MP..ID))}) ## All NA
+	## Qualifiers, ignore
+	lapply(raw, function(x) { summary(as.factor(x$Alternate.Method.Detectable.Limit))}) ## Great majority is NA. Clearly more data in PM than Ozone
+	lapply(raw, function(x) { summary(as.factor(x$Uncertainty))}) ## Except for 1 entry, all NA in Ozone. Great majority NA in PM.
+}
 
+## Extract columns of interest and then save the new file
+raw.small <- lapply(raw, function(x) {
+	cbind(x[, c("State.Code", "County.Code", "Site.ID", "POC", "Unit", "Method", "Date", "Start.Time", "Sample.Value")], data.frame("Null.flag" = !is.na(x$Null.Data.Code)))
+})
+names(raw.small) <- names(raw)
+print(object.size(raw.small), units="Mb")
+save(raw.small, file="raw-small.Rdata")
 
 
