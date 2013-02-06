@@ -1,0 +1,88 @@
+**** Job starts ****
+Wed Feb  6 01:09:02 EST 2013
+
+R version 2.15.2 Patched (2012-10-28 r61038) -- "Trick or Treat"
+Copyright (C) 2012 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+Platform: x86_64-unknown-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> source('pre-small.R')
+618.5 Mb
+177.4 Mb
+441.1 Mb
+620.7 Mb
+177.9 Mb
+442.8 Mb
+614.6 Mb
+176.6 Mb
+437.9 Mb
+620.9 Mb
+178.8 Mb
+442.1 Mb
+640.3 Mb
+183.4 Mb
+456.8 Mb
+642.5 Mb
+184.6 Mb
+458 Mb
+652.7 Mb
+188.2 Mb
+464.5 Mb
+670.8 Mb
+194.2 Mb
+476.6 Mb
+711.5 Mb
+205.3 Mb
+506.2 Mb
+410.4 Mb
+119 Mb
+291.4 Mb
+12.4 Mb
+3.9 Mb
+8.5 Mb
+12.2 Mb
+3.8 Mb
+8.4 Mb
+12 Mb
+3.8 Mb
+8.2 Mb
+11.4 Mb
+3.6 Mb
+7.8 Mb
+12 Mb
+3.7 Mb
+8.2 Mb
+17.7 Mb
+5.3 Mb
+12.3 Mb
+61.3 Mb
+17.8 Mb
+43.5 Mb
+114.5 Mb
+33.1 Mb
+81.4 Mb
+162.4 Mb
+46.3 Mb
+116.1 Mb
+99.6 Mb
+28.7 Mb
+70.9 Mb
+1935.5 Mb
+> 
+> 
+**** Job ends ****
+Wed Feb  6 01:21:20 EST 2013
