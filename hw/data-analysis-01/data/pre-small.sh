@@ -7,7 +7,7 @@ echo "**** Job starts ****"
 date
 
 # run pre
-R --min-vsize=3G --min-nsize=10M -e "source(pre-small.R)"
+R --min-vsize=3G --min-nsize=10M -e "source('pre-small.R')"
 
 echo "**** Job ends ****"
 date
