@@ -1,0 +1,189 @@
+**** Job starts ****
+Mon Feb 11 10:50:39 EST 2013
+
+R version 2.15.2 Patched (2013-02-08 r61876) -- "Trick or Treat"
+Copyright (C) 2013 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+Platform: x86_64-unknown-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> source('summarize-clean.R')
+[1] "Mon Feb 11 10:50:50 2013"
+[1] TRUE
+[1] "Calculating means (etc) of interest"
+[1] "Separating values of interest"
+[1] "Mon Feb 11 10:52:42 2013"
+[1] TRUE
+[1] "Calculating means (etc) of interest"
+[1] "Separating values of interest"
+[1] "Mon Feb 11 10:54:34 2013"
+[1] TRUE
+[1] "Calculating means (etc) of interest"
+[1] "Separating values of interest"
+[1] "Mon Feb 11 10:56:25 2013"
+[1] TRUE
+[1] "Calculating means (etc) of interest"
+[1] "Separating values of interest"
+[1] "Mon Feb 11 10:58:17 2013"
+[1] TRUE
+[1] "Calculating means (etc) of interest"
+[1] "Separating values of interest"
+[1] "Mon Feb 11 11:00:16 2013"
+[1] TRUE
+[1] "Calculating means (etc) of interest"
+[1] "Separating values of interest"
+[1] "Mon Feb 11 11:02:22 2013"
+[1] TRUE
+[1] "Calculating means (etc) of interest"
+[1] "Separating values of interest"
+[1] "Mon Feb 11 11:04:27 2013"
+[1] TRUE
+[1] "Calculating means (etc) of interest"
+[1] "Separating values of interest"
+[1] "Mon Feb 11 11:06:31 2013"
+[1] TRUE
+[1] "Calculating means (etc) of interest"
+[1] "Separating values of interest"
+[1] "Mon Feb 11 11:08:42 2013"
+[1] TRUE
+[1] "Calculating means (etc) of interest"
+[1] "Separating values of interest"
+[1] "Mon Feb 11 11:09:55 2013"
+[1] TRUE
+[1] "Calculating means (etc) of interest"
+[1] "Separating values of interest"
+[1] "Mon Feb 11 11:12:10 2013"
+[1] TRUE
+[1] "Calculating means (etc) of interest"
+[1] "Separating values of interest"
+[1] "Mon Feb 11 11:14:22 2013"
+[1] TRUE
+[1] "Calculating means (etc) of interest"
+[1] "Separating values of interest"
+[1] "Mon Feb 11 11:16:34 2013"
+[1] TRUE
+[1] "Calculating means (etc) of interest"
+[1] "Separating values of interest"
+[1] "Mon Feb 11 11:18:42 2013"
+[1] TRUE
+[1] "Calculating means (etc) of interest"
+[1] "Separating values of interest"
+[1] "Mon Feb 11 11:20:49 2013"
+[1] TRUE
+[1] "Calculating means (etc) of interest"
+[1] "Separating values of interest"
+[1] "Mon Feb 11 11:23:03 2013"
+[1] TRUE
+[1] "Calculating means (etc) of interest"
+[1] "Separating values of interest"
+[1] "Mon Feb 11 11:26:05 2013"
+[1] TRUE
+[1] "Calculating means (etc) of interest"
+[1] "Separating values of interest"
+[1] "Mon Feb 11 11:30:11 2013"
+[1] TRUE
+[1] "Calculating means (etc) of interest"
+[1] "Separating values of interest"
+[1] "Mon Feb 11 11:35:07 2013"
+[1] TRUE
+[1] "Calculating means (etc) of interest"
+[1] "Separating values of interest"
+[1] "Mon Feb 11 11:37:16 2013"
+[1] FALSE
+[1] "Calculating means (etc) of interest"
+[1] "Separating values of interest"
+[1] "Mon Feb 11 11:38:21 2013"
+[1] FALSE
+[1] "Calculating means (etc) of interest"
+[1] "Separating values of interest"
+[1] "Mon Feb 11 11:39:28 2013"
+[1] FALSE
+[1] "Calculating means (etc) of interest"
+[1] "Separating values of interest"
+[1] "Mon Feb 11 11:40:33 2013"
+[1] FALSE
+[1] "Calculating means (etc) of interest"
+[1] "Separating values of interest"
+[1] "Mon Feb 11 11:41:39 2013"
+[1] FALSE
+[1] "Calculating means (etc) of interest"
+[1] "Separating values of interest"
+[1] "Mon Feb 11 11:42:48 2013"
+[1] FALSE
+[1] "Calculating means (etc) of interest"
+[1] "Separating values of interest"
+[1] "Mon Feb 11 11:43:57 2013"
+[1] FALSE
+[1] "Calculating means (etc) of interest"
+[1] "Separating values of interest"
+[1] "Mon Feb 11 11:45:07 2013"
+[1] FALSE
+[1] "Calculating means (etc) of interest"
+[1] "Separating values of interest"
+[1] "Mon Feb 11 11:46:20 2013"
+[1] FALSE
+[1] "Calculating means (etc) of interest"
+[1] "Separating values of interest"
+[1] "Mon Feb 11 11:47:38 2013"
+[1] FALSE
+[1] "Calculating means (etc) of interest"
+[1] "Separating values of interest"
+[1] "Mon Feb 11 11:48:26 2013"
+[1] FALSE
+[1] "Calculating means (etc) of interest"
+[1] "Separating values of interest"
+[1] "Mon Feb 11 11:49:41 2013"
+[1] FALSE
+[1] "Calculating means (etc) of interest"
+[1] "Separating values of interest"
+[1] "Mon Feb 11 11:50:53 2013"
+[1] FALSE
+[1] "Calculating means (etc) of interest"
+[1] "Separating values of interest"
+[1] "Mon Feb 11 11:52:04 2013"
+[1] FALSE
+[1] "Calculating means (etc) of interest"
+[1] "Separating values of interest"
+[1] "Mon Feb 11 11:53:13 2013"
+[1] FALSE
+[1] "Calculating means (etc) of interest"
+[1] "Separating values of interest"
+[1] "Mon Feb 11 11:54:21 2013"
+[1] FALSE
+[1] "Calculating means (etc) of interest"
+[1] "Separating values of interest"
+[1] "Mon Feb 11 11:55:28 2013"
+[1] FALSE
+[1] "Calculating means (etc) of interest"
+[1] "Separating values of interest"
+[1] "Mon Feb 11 11:56:37 2013"
+[1] FALSE
+[1] "Calculating means (etc) of interest"
+[1] "Separating values of interest"
+[1] "Mon Feb 11 11:57:47 2013"
+[1] FALSE
+[1] "Calculating means (etc) of interest"
+[1] "Separating values of interest"
+[1] "Mon Feb 11 11:58:56 2013"
+[1] FALSE
+[1] "Calculating means (etc) of interest"
+[1] "Separating values of interest"
+28.1 Mb
+16.8 Mb
+> 
+> 
+**** Job ends ****
+Mon Feb 11 11:59:38 EST 2013
