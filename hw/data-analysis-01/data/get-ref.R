@@ -3,7 +3,7 @@ ref <- data.frame(name = c("Units", "StatesAndCounty", "Collection", "Duration")
 
 ## Download reference files
 apply(ref, 1, function(x) {
-	download.file(x[1], destfile = x[2])
+	download.file(x[2], destfile = x[3], method="curl")
 })
 
 ## Save info
