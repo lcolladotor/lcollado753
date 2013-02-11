@@ -111,10 +111,3 @@ print(object.size(clean), units="Mb")
 
 ## Save the clean data
 save(clean, file = "clean.Rdata", compress="gzip") ## bzip2 was 69M but took forever to compress
-
-
-## Proceed to summarize the data
-
-
-
-
