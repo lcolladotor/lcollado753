@@ -70,8 +70,8 @@ County <- lapply(clean, function(x) {
 	return(res)
 })
 
-print(object.size(month.site), units="Mb")
-print(object.size(month.county), units="Mb")
+print(object.size(Site), units="Mb")
+print(object.size(County), units="Mb")
 
 ## Save files
 save(Site, file="Site.Rdata", compress="gzip")
