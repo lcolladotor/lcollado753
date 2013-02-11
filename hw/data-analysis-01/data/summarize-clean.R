@@ -20,7 +20,7 @@ if(FALSE) {
 }
 
 ## Means by State-County-Site-Month
-Site <- lapply(clean, function(x) {
+month.site <- lapply(clean, function(x) {
 	## Extract month information
 	month <- substring(x$Date, 1, 6)
 	
@@ -28,9 +28,11 @@ Site <- lapply(clean, function(x) {
 	comb <- paste(x$State, x$County, x$Site, month, sep="|")
 	
 	## Get means by combination of interest
-	# This step is slow....
-	means <- tapply(x$Value, comb, mean, na.rm = FALSE)
-	se <- tapply(x$Value, comb, sd, na.rm = FALSE)
+	comb.ir <- successiveIRanges(runLength(comb))
+	values <- Views(x$Value, comb.ir)
+	means <- viewMeans(values)
+	se <- viewApply(values, sd)
+	
 	
 	## Separate values of interest
 	comb.split <- strsplit(names(means), "\\|")
@@ -46,7 +48,7 @@ Site <- lapply(clean, function(x) {
 })
 
 ## Means by State-County-Month
-County <- lapply(clean, function(x) {
+month.county <- lapply(clean, function(x) {
 	## Extract month information
 	month <- substring(x$Date, 1, 6)
 	
@@ -54,9 +56,10 @@ County <- lapply(clean, function(x) {
 	comb <- paste(x$State, x$County, month, sep="|")
 	
 	## Get means by combination of interest
-	# This step is slow....
-	means <- tapply(x$Value, comb, mean, na.rm = FALSE)
-	se <- tapply(x$Value, comb, sd, na.rm = FALSE)
+	comb.ir <- successiveIRanges(runLength(comb))
+	values <- Views(x$Value, comb.ir)
+	means <- viewMeans(values)
+	se <- viewApply(values, sd)
 	
 	## Separate values of interest
 	comb.split <- strsplit(names(means), "\\|")
@@ -74,5 +77,5 @@ print(object.size(Site), units="Mb")
 print(object.size(County), units="Mb")
 
 ## Save files
-save(Site, file="Site.Rdata", compress="gzip")
-save(County, file="County.Rdata", compress="gzip")
+save(month.site, file="month-site.Rdata", compress="gzip")
+save(month.county, file="month-county.Rdata", compress="gzip")
