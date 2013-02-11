@@ -62,7 +62,7 @@ County <- lapply(clean, function(x) {
 	comb.split <- strsplit(names(means), "\\|")
 	state <- unlist(lapply(comb.split, function(x) { x[1] }))
 	county <- unlist(lapply(comb.split, function(x) { x[2] }))
-	month2 <- unlist(lapply(comb.split, function(x) { x[4] }))
+	month2 <- unlist(lapply(comb.split, function(x) { x[3] }))
 	month3 <- as.Date(paste(month2,"15", sep="/"), format="%Y%m/%d")
 	
 	res <- data.frame(State = state, County = county, Month = month3, Mean.Value = means, row.names = 1:length(state), SE = se)
