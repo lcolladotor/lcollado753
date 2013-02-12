@@ -62,7 +62,7 @@
 % knitr options
 <<setup, include=FALSE, cache=FALSE>>=
 # set global chunk options
-opts_chunk$set(fig.path='fig-', fig.align='center', fig.show='hold', fig.width=7, fig.height=7, out.width='.8\\linewidth')
+opts_chunk$set(fig.path='fig-', fig.align='center', fig.show='hold', fig.width=7, fig.height=7, cache=TRUE, echo=FALSE, out.width='.8\\linewidth')
 options(width=90)
 @
 
@@ -79,8 +79,28 @@ options(width=90)
 \end{center}
 % \end{titlepage}
 
+\begin{abstract}
+	For this assignment, we had to obtain the last 10 years of data for Ozone and PM 2.5 from the EPA website and explore the following points. (1) What are the trends? (2) Do the trends differ between Ozone and PM 2.5? (3) Are there any differences between the East and West of the United States? (4) Can we detect any change in regulation? In this document I describe the pre-processing and analysis I carried out.
+\end{abstract}
 %%%%%%%%%% Write document %%%%%%%%%%%%%%
 
+<<loaddata>>=
+## Load data
+load("../EDA/county-eda.Rdata")
+
+## Load libraries
+library(ggplot2)
+@
+
+\section{Pre-processing}
+
+Once I downloaded all the data, I wanted to explore the impact of all the variables by looking at the full data set. Via simple summary analysis, I determined to keep the columns \emph{State.Code, County.Code, Site.ID, POC, Unit, Method, Date, Start.Time, Sample.Value} as I determined that they had the most usefulness potential\footnote{More at data/pre-proc.R}. The size of the tables posed a problem for other pre-processing steps, so I used the \emph{IRanges} package to compress the information from 18Gb to 2Gb in RAM\footnote{More at data/pre-small.R}. Using \emph{IRanges} I cleaned the information by keeping only \emph{State, County, Site.ID, Date, Sample.Value} while using other tables from the AQS data site to obtain the state abbreviations and county names\footnote{More at data/process-pre.R and data/get-ref.R}. Furthermore, I adjusted the units to by keeping them in parts per million and micrograms per cubic meter for Ozone and PM 2.5 respectively. A few entries in liters per minute were discarded because they are incompatible with micrograms per cubic meter. Finally, I created two major summaries by calculating the mean, the standard error, first and third quartiles by grouping the information by the unique combination of State (Abbr), County (name), Month (year and month), and Site ID. The simpler version did not consider the Site ID in creating the unique combinations. Doing so efficiently was much more challenging than what I expected\footnote{More at data/summarize-clean.R} because the \emph{tapply()} function was rather slow with objects from the \emph{IRanges} package.
+
+
+\section{Exploratory data analysis}
+
+
+\section{Conclusions}
 
 % For references, uncomment and remember to use the following series
 % when compling the pdf:
