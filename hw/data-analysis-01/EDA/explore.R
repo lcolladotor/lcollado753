@@ -133,4 +133,4 @@ ggplot(subset(comp.county, State == "AR"), aes(x=Month, y=Mean.Value.PM)) + geom
 library(maps)
 map.county <- map_data("county")
 
-save(df.county, comp.county, states, state.county, means.county, file="county-eda.Rdata")
+save(df.county, comp.county, states, state.county, means.county, all.county, file="county-eda.Rdata")
