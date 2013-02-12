@@ -24,8 +24,21 @@ team <- xpathSApply(html3, "//li[@class='team-name']", xmlValue)
 dates <- xpathSApply(html3, "//tr[contains(@class,'row team')]/td[2]",xmlValue)
 
 
+## Get Baltimore and opponent's scores
+score.split <- lapply(strsplit(score, "-"), function(x) { gsub(" [0-9]*OT", "", x) })
+fooAssign <- function(x, y) { 
+	res <- as.numeric(x)
+	if(y == "L") {
+		res <- rev(res)
+	}
+	return(res)
+}
+score.mat <- mapply(fooAssign, score.split, win)
+
+dates <- as.Date(paste(dates, rep(c(2013, 2012), c(4, 16)), sep="-"), format = "%a, %b %d-%Y")
+
 ## Group into a data.frame
-data <- data.frame(Win = win, Score = score, Where = where, Team = team, Date = dates)
+data <- data.frame(Win = win, Ravens = score.mat[1, ], Opp = score.mat[2, ], Where = where, Team = team, Date = dates)
 data
 ```
 
