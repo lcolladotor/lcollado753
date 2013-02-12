@@ -154,6 +154,11 @@ PM 2.5 levels are decreasing, specially after regulation was implemented in 2008
 
 \newpage
 \appendix
+
+\section{Acknowlegements}
+
+I acknowledge that Jiawei Bai explained how to separate West and East states. 
+
 \section{Supplementary figures}
 
 Figure \ref{fig:densities} shows the densities for the monthly mean per county for PM 2.5 and Ozone. It uses the complete case data. We can observe how the Ozone data looks fairly bell-curved and symmetric while the PM 2.5 data is highly skewed. In addition, the East has higher values than the West for both PM 2.5 and Ozone levels.
