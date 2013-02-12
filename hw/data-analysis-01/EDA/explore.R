@@ -111,10 +111,26 @@ head(df.county)
 ## ggplot(df.county, aes(x=Mean.Value, y=Month, colour=Cardinal)) + stat_summary(fun.y =mean, geom="point") + facet_grid(Type ~., scale="free_y") ## too slow
 qplot(Month, Mean.Value, data=df.county, geom = "point", stat="summary", fun.y =mean) + facet_grid(Type ~ Cardinal, scale="free_y") + geom_smooth(method=lm, formula= y~ns(x, 24)) ## Use this
 
-## Heatmap
+# Old Heatmap
 ggplot(comp.county, aes(x=Month, y=State, fill=Mean.Value.PM)) + geom_raster()
 ggplot(comp.county, aes(x=Month, y=State, fill=Mean.Value.Ozone)) + geom_raster()
+
+## Heatmap using plyr
+library(plyr)
+state.county <- ddply(comp.county, c("Month", "State"), summarise, Month.Mean.PM = mean(Mean.Value.PM, na.rm=TRUE), Month.Mean.Ozone = mean(Mean.Value.Ozone, na.rm=TRUE))
+ggplot(state.county, aes(x=Month, y=State, fill=Month.Mean.PM)) + geom_raster()
+ggplot(state.county, aes(x=Month, y=State, fill=Month.Mean.Ozone)) + geom_raster()
+
+## Heatmap with RColorBrewer
+library(RColorBrewer)
+cols <- brewer.pal(11, "PuOr")
+ggplot(state.county, aes(x=Month, y=State, fill=Month.Mean.PM)) + geom_raster() + scale_fill_gradient2(midpoint = median(state.county$Month.Mean.PM), mid=cols[6], low=cols[1], high=cols[11]) + theme(panel.background = element_rect(fil="lightblue")) 
+
+
+ggplot(subset(comp.county, State == "AR"), aes(x=Month, y=Mean.Value.PM)) + geom_point() + geom_smooth(method=loess)
 
 ## Map?
 library(maps)
 map.county <- map_data("county")
+
+save(df.county, comp.county, states, state.county, means.county, file="county-eda.Rdata")
