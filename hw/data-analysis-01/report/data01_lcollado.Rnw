@@ -94,13 +94,99 @@ library(ggplot2)
 
 \section{Pre-processing}
 
-Once I downloaded all the data, I wanted to explore the impact of all the variables by looking at the full data set. Via simple summary analysis, I determined to keep the columns \emph{State.Code, County.Code, Site.ID, POC, Unit, Method, Date, Start.Time, Sample.Value} as I determined that they had the most usefulness potential\footnote{More at data/pre-proc.R}. The size of the tables posed a problem for other pre-processing steps, so I used the \emph{IRanges} package to compress the information from 18Gb to 2Gb in RAM\footnote{More at data/pre-small.R}. Using \emph{IRanges} I cleaned the information by keeping only \emph{State, County, Site.ID, Date, Sample.Value} while using other tables from the AQS data site to obtain the state abbreviations and county names\footnote{More at data/process-pre.R and data/get-ref.R}. Furthermore, I adjusted the units to by keeping them in parts per million and micrograms per cubic meter for Ozone and PM 2.5 respectively. A few entries in liters per minute were discarded because they are incompatible with micrograms per cubic meter. Finally, I created two major summaries by calculating the mean, the standard error, first and third quartiles by grouping the information by the unique combination of State (Abbr), County (name), Month (year and month), and Site ID. The simpler version did not consider the Site ID in creating the unique combinations. Doing so efficiently was much more challenging than what I expected\footnote{More at data/summarize-clean.R} because the \emph{tapply()} function was rather slow with objects from the \emph{IRanges} package.
+Once I downloaded all the data, I wanted to explore the impact of all the variables by looking at the full data set. Via simple summary analysis, I determined to keep the columns \emph{State.Code, County.Code, Site.ID, POC, Unit, Method, Date, Start.Time, Sample.Value} as I determined that they had the most usefulness potential\footnote{More at data/pre-proc.R}. The size of the tables posed a problem for other pre-processing steps, so I used the \emph{IRanges} package to compress the information from 18Gb to 2Gb in RAM\footnote{More at data/pre-small.R}. Using \emph{IRanges} I cleaned the information by keeping only \emph{State, County, Site.ID, Date, Sample.Value} while using other tables from the AQS data site to obtain the state abbreviations and county names\footnote{More at data/process-pre.R and data/get-ref.R}. Furthermore, I adjusted the units to by keeping them in parts per million and micrograms per cubic meter for Ozone and PM 2.5 respectively. A few entries in liters per minute were discarded because they are incompatible with micrograms per cubic meter. Finally, I created two major summaries by calculating the mean, the standard error, first and third quartiles by grouping the information by the unique combination of State (abbr), County (name), Month (year and month, set day to 15), and Site ID. The simpler version did not consider the Site ID in creating the unique combinations. Doing so efficiently was much more challenging than what I expected\footnote{More at data/summarize-clean.R} because the \emph{tapply()} function was rather slow with objects from the \emph{IRanges} package.
 
 
 \section{Exploratory data analysis}
 
+For this section, I used the summarized data that did not take into account the Site ID. While there are \Sexpr{nrow(all.county)} total entries once merging Ozone and PM 2.5, the ones without any missing information reduce to \Sexpr{nrow(comp.county)}. This an pose some problem as we can see in Figure \ref{fig:heatmap} where we can clearly notice the missing information, which can be more frequent in some states such as \emph{AK:Alaska} and \emph{NE:Nebraska}.
+
+<<heatmap, fig.cap="Montly mean PM 2.5 from the counties separated by state. Background is in light blue to clearly notice the missing observations. There are some months without any data in all states. Uses only complete cases.", out.width='1.2\\linewidth'>>=
+
+library(RColorBrewer)
+cols <- brewer.pal(11, "PuOr")
+ggplot(state.county, aes(x=Month, y=State, fill=Month.Mean.PM)) + geom_raster() + scale_fill_gradient2(midpoint = median(state.county$Month.Mean.PM), mid=cols[6], low=cols[1], high=cols[11]) + theme(panel.background = element_rect(fil="lightblue")) 
+@
+
+Figure \ref{fig:heatmap} provides a major indication as to when regulation might have been implemented during the period under analysis. That is because there are several states, such as WA and VT that had high values in the early years (closer to purple) which decrease during 2007 and 2008. I believe that this reflects the regulations the EPA undertook as summarized in \url{http://www.epa.gov/pm/actions.html}.
+
+
+In Figure \ref{fig:heatmap}, one state that pops out is \emph{AR:Arkansas} because of the high peak in PM 2.5 in 2011. Figure \ref{fig:arkansas} (supplementary material) shows the trend in more detail.
+
+Figure \ref{fig:trends} is the most important one in this report. This figure shows the mean of the PM 2.5 and Ozone levels per month by averaging the information from the counties. I used natural splines with 20 degrees of freedom to smooth the trends. We have data for 10 years and there seem to be clear seasonal trends around winter and summer. Thus, 20 degrees of freedom seems appropriate.
+
+Figure \ref{fig:trends} clearly shows that the PM 2.5 has been decreasing since 2008. It still maintains a seasonal trend with higher values during the summer and lower ones during the winter. Notably, the winter of 2012 has been rather low. While Ozone shares overall the seasonal trend with PM 2.5, it has been increasing since 2010. The fact that both 2011 and 2012 presented higher Ozone values than 2010 is alarming.
+
+We can also use Figure \ref{fig:trends} to compare the East versus the West states of the Unites States. Overall, the East states have higher PM 2.5 and Ozone values than the West states. This is expected in a sense because the majority of the densely populated areas of the US are in the East coast. 
+
+<<trends, fig.cap="Mean PM 2.5 and Ozone levels per month from the counties. Smooth line is a from a natural spline with 20 degrees of freedom. Grey bands mark the 95\\% confidence bands. Uses full data as it does not pair up PM 2.5 and Ozone observations.">>=
+
+## Load library
+library(splines)
+qplot(Month, Mean.Value, data=df.county, geom = "point", stat="summary", fun.y =mean) + facet_grid(Type ~ Cardinal, scale="free_y") + geom_smooth(method=lm, formula= y~ns(x, 20))
+@
+
+
+\section{PM 2.5 versus Ozone}
+
+<<findFit>>=
+fit <- lm(Mean.Value.Ozone ~ Mean.Value.PM + SE.PM + Q1.PM + Q3.PM + Cardinal + Month, data = comp.county)
+@
+
+
+
+Using the data from all the counties, it would be great if we could find a direct relationship between PM 2.5 and Ozone levels. However, Figure \ref{fig:scatter} does not indicate to us that anything is going on. This affirmation is further supported by the poor results of a multiple linear regression as shown in Table \ref{tab:lm}. The adjusted R-squared for this regression is \Sexpr{summary(fit)$adj.r.squared} which is very weak. Also, the cardinality (East or West) has a larger coefficient than other variables!
+
+<<scatter, out.width='.55\\linewidth', fig.cap="Mean PM 2.5 vs mean Ozone levels by county. Alpha set to $1/5$ so 5 points are needed for alpha to reach 1. Smooth lines are from a natural spline with 5 degrees of freedom. Uses complete cases.">>=
+
+ggplot(subset(comp.county, Mean.Value.PM <= 50), aes(x=Mean.Value.PM, y=Mean.Value.Ozone, colour = Cardinal)) + geom_point(alpha=1/5) + geom_smooth(method=lm, formula=y ~ ns(x, 5))
+@
+
+<<fit, results='asis'>>=
+library(xtable)
+print(xtable(summary(fit), caption="Linear regression summary results.", label="tab:lm", digits = -1), size="footnotesize")
+@
 
 \section{Conclusions}
+
+PM 2.5 levels are decreasing, specially after regulation was implemented in 2008, while Ozone levels have been increasing lately. Also, the East states have higher levels than the West states. However, an early analysis at using the means by county data to relate PM 2.5 to Ozone directly failed. 
+
+
+\newpage
+\appendix
+\section{Supplementary figures}
+
+Figure \ref{fig:densities} shows the densities for the monthly mean per county for PM 2.5 and Ozone. It uses the complete case data. We can observe how the Ozone data looks fairly bell-curved and symmetric while the PM 2.5 data is highly skewed. In addition, the East has higher values than the West for both PM 2.5 and Ozone levels.
+
+<<densities, fig.cap="Densities of the mean monthly values per county for PM 2.5 and Ozone. Uses complete case data.", out.width='.6\\linewidth', fig.pos="H">>=
+
+suppressMessages(library(gridExtra))
+a <- ggplot(comp.county, aes(x=Mean.Value.PM, fill=Cardinal)) + geom_density(alpha=0.3) #+ xlim(c(0, 50))
+b <- ggplot(comp.county, aes(x=Mean.Value.Ozone, fill=Cardinal)) + geom_density(alpha=0.3)
+grid.arrange(a, b)
+@
+
+Figure \ref{fig:arkansas} shows the trend for PM 2.5 for the counties in the state of Arkansas. The major outlier is from June 2011 from the county of Crittenden. I could not find a major event explaining this rise in PM 2.5 beyond seasonal wildfires. More at \url{http://alg.umbc.edu/usaq/archives/2011_06.html}.
+
+<<arkansas, out.width='.6\\linewidth', fig.cap="Mean PM 2.5 per month for Arkansas counties. Smooth line is from a natural spline with 20 degrees of freedom. Grey bands mark the 95\\% confidence bands. Uses complete cases.">>=
+
+ggplot(subset(comp.county, State == "AR"), aes(x=Month, y=Mean.Value.PM)) + geom_point() + geom_smooth(method=lm, formula=y~ns(x, 20))
+@
+
+
+
+
+Figure \ref{fig:trends2} is similar to Figure \ref{fig:trends}. I didn't know how to make the $X$-axis comparable in this version. Note that Figure \ref{fig:trends2} uses the complete case data which is why the values are a bit different compared to Figure \ref{fig:trends}.
+
+<<trends2, fig.cap="Mean PM 2.5 and Ozone levels per month from the counties. Smooth line is a from a natural spline with 20 degrees of freedom. Grey bands mark the 95\\% confidence bands. Uses complete cases.", out.width='.6\\linewidth'>>=
+
+suppressMessages(library(gridExtra))
+a <- ggplot(comp.county, aes(x=Month, y=Mean.Value.PM, colour=Cardinal)) + stat_summary(fun.y = mean, geom="point") + geom_smooth(method=lm, formula= y ~ ns(x, 20))
+b <- ggplot(comp.county, aes(x=Month, y=Mean.Value.Ozone, colour=Cardinal)) + stat_summary(fun.y = mean, geom="point") + geom_smooth(method=lm, formula= y ~ ns(x, 20))
+grid.arrange(a, b)
+@
+
+
 
 % For references, uncomment and remember to use the following series
 % when compling the pdf:
