@@ -86,8 +86,10 @@ ggplot(comp.county, aes(x=Month, y=Mean.Value.PM)) + geom_line() + geom_smooth(m
 ggplot(comp.county, aes(x=Month, y=Mean.Value.PM, colour=Cardinal)) + geom_point(alpha=1/20, shape=1) + geom_smooth(method=lm, formula = y ~ ns(x, 20))
 
 ## Densities
-ggplot(comp.county, aes(x=Mean.Value.PM, fill=Cardinal)) + geom_density(alpha=0.3) #+ xlim(c(0, 50))
-ggplot(comp.county, aes(x=Mean.Value.Ozone, fill=Cardinal)) + geom_density(alpha=0.3)
+library(gridExtra)
+a <- ggplot(comp.county, aes(x=Mean.Value.PM, fill=Cardinal)) + geom_density(alpha=0.3) #+ xlim(c(0, 50))
+b <- ggplot(comp.county, aes(x=Mean.Value.Ozone, fill=Cardinal)) + geom_density(alpha=0.3)
+grid.arrange(a, b)
 
 ## 2-d density
 ggplot(comp.county, aes(x=Mean.Value.PM, y=Mean.Value.Ozone)) + stat_density2d(aes(colour=..level..))
@@ -97,9 +99,9 @@ ggplot(comp.county, aes(x=Mean.Value.PM, y=Mean.Value.Ozone)) + stat_density2d(g
 ggplot(comp.county, aes(x=Month, y=Mean.Value.PM, colour=Cardinal)) + stat_summary(fun.y = mean, geom="point") + geom_smooth(method=lm)
 ggplot(comp.county, aes(x=Month, y=Mean.Value.PM, colour=Cardinal)) + stat_summary(fun.y = mean, geom="point") + geom_smooth(method=gam, formula= y ~ s(x, bs="cs"))
 ## like these two
-ggplot(comp.county, aes(x=Month, y=Mean.Value.PM, colour=Cardinal)) + stat_summary(fun.y = mean, geom="point") + geom_smooth(method=lm, formula= y ~ ns(x, 24))
-ggplot(comp.county, aes(x=Month, y=Mean.Value.Ozone, colour=Cardinal)) + stat_summary(fun.y = mean, geom="point") + geom_smooth(method=lm, formula= y ~ ns(x, 24))
-
+a <- ggplot(comp.county, aes(x=Month, y=Mean.Value.PM, colour=Cardinal)) + stat_summary(fun.y = mean, geom="point") + geom_smooth(method=lm, formula= y ~ ns(x, 24))
+b <- ggplot(comp.county, aes(x=Month, y=Mean.Value.Ozone, colour=Cardinal)) + stat_summary(fun.y = mean, geom="point") + geom_smooth(method=lm, formula= y ~ ns(x, 24))
+grid.arrange(a, b)
 
 ## Attempting to plot both Ozone and PM vs time
 df.county <- rbind(month.county[[1]], month.county[[2]])
@@ -128,6 +130,8 @@ ggplot(state.county, aes(x=Month, y=State, fill=Month.Mean.PM)) + geom_raster() 
 
 
 ggplot(subset(comp.county, State == "AR"), aes(x=Month, y=Mean.Value.PM)) + geom_point() + geom_smooth(method=loess)
+
+ggplot(subset(comp.county, State == "AR"), aes(x=Month, y=Mean.Value.PM)) + geom_point() + geom_smooth(method=lm, formula=y~ns(x, 24))
 
 ## Map?
 library(maps)
