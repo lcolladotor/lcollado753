@@ -1,8 +1,45 @@
 ## Load data
 load("../data/fell.Rdata")
 
-## Simple EDA
+### Simple EDA
+
+## Data over time
 plot(fell$date, fell$visits, col=ifelse(fell$post, "blue", "orange"))
 tapply(fell$visit, fell$post, mean)
+
+## Some "FALSE" have high number of visits. Possibly carrying over from a post the day before.
 boxplot(fell$visit ~ fell$post)
+
+## Diff in means in significant
 t.test(fell$visit ~ fell$post)
+
+## Not normal looking
+qqnorm(fell$visit[fell$post])
+qqnorm(fell$visit[!fell$post])
+
+## Lets compare days of the post and 2 days after vs rest
+postDays <- function(df, day) {
+	days <- df$date[df$post]
+	new <- sapply(2:day, function(x) { days + x}, simplify=FALSE)
+	all <- sort(c(days, do.call(c, new)))
+	add <- data.frame(df$date %in% all)
+	colnames(add) <- paste0("post", day)
+	cbind(df, add)
+}
+## Marc days with posts (and the day after too)
+fell2 <- postDays(fell, 2)
+
+## View data
+plot(fell2$date, fell2$visits, col=ifelse(fell2$post2, "blue", "orange"))
+
+## Visits are still different
+boxplot(fell2$visit ~ fell2$post2)
+
+## Smaller difference than when comparing vs day of the post (see previous t.test)
+t.test(fell2$visit ~ fell2$post2)
+
+## Looks very similar for non post days vs also excluding day after post
+boxplot(fell$visit[!fell$post], fell2$visit[!fell2$post2])
+
+## No significant diff in the mean for all non post days vs also excluding day after post
+t.test(fell$visit[!fell$post], fell2$visit[!fell2$post2])
