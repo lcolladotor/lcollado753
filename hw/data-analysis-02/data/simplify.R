@@ -29,7 +29,7 @@ simply$post <- simply$date %in% posts$date
 plot(simply$date, simply$v, col=ifelse(simply$post, "blue", "orange"))
 
 ## Remove the early 2011 info before a post was made
-simply <- simply[simply$date >= simply$date[which(simply$v > 0)[1]], ]
+simply <- simply[simply$date >= posts$date[1], ]
 rownames(simply) <- 1:nrow(simply)
 
 ## Save data
