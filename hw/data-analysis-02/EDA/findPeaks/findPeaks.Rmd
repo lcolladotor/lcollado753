@@ -8,10 +8,15 @@ load("../../data/posts.controversy.proc.Rdata")
 
 ## Calculate running means by 5 days
 ## I ran this with +-3 days and the results look worse in the sense that many peaks are next to each other.
-runmeans <- data.frame(start = simply$date -2, end = simply$date + 2, mean = rep(NA, nrow(simply)))
-for(i in 1:nrow(runmeans)) {
-	runmeans$mean[i] <- mean(simply$v[ simply$date >= runmeans$start[i] & simply$date <= runmeans$end[i] ])
+getRunMeans <- function(window = 2) {
+	runmeans <- data.frame(start = simply$date - window, end = simply$date + window, mean = rep(NA, nrow(simply)))
+	for(i in 1:nrow(runmeans)) {
+		runmeans$mean[i] <- mean(simply$v[ simply$date >= runmeans$start[i] & simply$date <= runmeans$end[i] ])
+	}
+	return(runmeans)
 }
+runmeans <- getRunMeans()
+
 
 ## Some EDA on the running means
 plot(simply$date, runmeans$mean)
@@ -179,12 +184,293 @@ p95 <- getPeaks(simply, diff, 0.95)
 p95.2 <- getPeaks(simply, diff, 0.95, 2)
 p90 <- getPeaks(simply, diff, 0.90)
 p90.2 <- getPeaks(simply, diff, 0.90, 2)
+p95
+p95.2
+dim(p90)
+dim(p90.2)
 
 ## Checking posts in that large peak
 subset(posts, date >= "2012-11-26" & date <= "2012-11-29")
 
 ```
 
-Proceed
+Proceed to complete the information for the peaks
+
+```{r}
+
+completePeaks <- function(peak, df, post) {
+	
+	### Get information from before the peak
+	
+	## pre start day (1st day of data or last peak end + 1)
+	pre.start <- sapply(1:nrow(peak), function(x) {
+		if(x == 1) {
+			res <- df$date[1]
+		} else {
+			res <- peak$end[x-1] + 1
+		}
+		return(res)
+	}, simplify=FALSE)
+	pre.start <- do.call(c, pre.start)
+	
+	## pre end day (1 day before the peak begins)
+	pre.end <- sapply(1:nrow(peak), function(x) {
+		peak$start[x] - 1
+	}, simplify=FALSE)
+	pre.end <- do.call(c, pre.end)
+	
+	## Get max visits on pre-peak
+	pre.v.max <- mapply(function(x, y) {
+		z <- subset(df, date >= x & date <= y)
+		max(z$v)
+	}, pre.start, pre.end)
+	pre.twi.max <- mapply(function(x, y) {
+		z <- subset(df, date >= x & date <= y)
+		max(z$twi)
+	}, pre.start, pre.end)
+	
+	## Get min visits on pre-peak
+	pre.v.min <- mapply(function(x, y) {
+		z <- subset(df, date >= x & date <= y)
+		min(z$v)
+	}, pre.start, pre.end)
+	pre.twi.min <- mapply(function(x, y) {
+		z <- subset(df, date >= x & date <= y)
+		min(z$twi)
+	}, pre.start, pre.end)
+	
+	## Total visits on pre-peak
+	pre.v.tot <- mapply(function(x, y) {
+		z <- subset(df, date >= x & date <= y)
+		sum(z$v)
+	}, pre.start, pre.end)
+	pre.twi.tot <- mapply(function(x, y) {
+		z <- subset(df, date >= x & date <= y)
+		sum(z$twi)
+	}, pre.start, pre.end)
+	
+	## Mean visits on pre-peak
+	pre.v.mean <- mapply(function(x, y) {
+		z <- subset(df, date >= x & date <= y)
+		mean(z$v)
+	}, pre.start, pre.end)
+	pre.twi.mean <- mapply(function(x, y) {
+		z <- subset(df, date >= x & date <= y)
+		mean(z$twi)
+	}, pre.start, pre.end)
+	
+	## SD visits on pre-peak
+	pre.v.sd <- mapply(function(x, y) {
+		z <- subset(df, date >= x & date <= y)
+		sd(z$v)
+	}, pre.start, pre.end)
+	pre.twi.sd <- mapply(function(x, y) {
+		z <- subset(df, date >= x & date <= y)
+		sd(z$twi)
+	}, pre.start, pre.end)
+		
+	## ndays on pre-peak
+	pre.ndays <- mapply(function(x, y) {
+		z <- subset(df, date >= x & date <= y)
+		nrow(z)
+	}, pre.start, pre.end)
+	
+	## Avg  # posts / day on pre-peak
+	pre.posts <- mapply(function(x, y) {
+		z <- subset(post, date >= x & date <= y)
+		nrow(z)
+	}, pre.start, pre.end)
+	pre.posts.day <- pre.posts / pre.ndays
+	
+		
+	### Get information from the peak
+	
+	## posts by author
+	author <- mapply(function(x, y) {
+		z <- subset(post, date >= x & date <= y)
+		roger <- sum(z$author == "Roger Peng")
+		rafa <- sum(z$author == "Rafael Irizarry")
+		jeff <- sum(z$author == "Jeff Leek")
+		#other <- sum(z$author %in% c("admin", "Steven Salzberg"))
+		data.frame(Roger = roger, Rafa = rafa, Jeff = jeff) #, Other = other)
+	}, peak$start, peak$end, SIMPLIFY=FALSE)
+	peak.author <- do.call(rbind, author)
+	
+	## peak Avg controversial ranking of the posts
+	peak.posts.cont.mean <- mapply(function(x, y) {
+		z <- subset(post, date >= x & date <= y)
+		if(nrow(z) > 0) {
+			res <- mean(z$cont)
+		} else {
+			res <- 0	
+		}
+		return(res)
+	}, peak$start, peak$end)
+	
+	## Max controversial ranking of the posts
+	peak.posts.cont.max <- mapply(function(x, y) {
+		z <- subset(post, date >= x & date <= y)
+		if(nrow(z) > 0) {
+			res <- max(z$cont)
+		} else {
+			res <- 0	
+		}
+		return(res)
+	}, peak$start, peak$end)
+	
+	## Min controversial ranking of the posts
+	peak.posts.cont.min <- mapply(function(x, y) {
+		z <- subset(post, date >= x & date <= y)
+		if(nrow(z) > 0) {
+			res <- min(z$cont)
+		} else {
+			res <- 0	
+		}
+		return(res)
+	}, peak$start, peak$end)
+	
+	## peak max
+	peak.v.max <- mapply(function(x, y) {
+		z <- subset(df, date >= x & date <= y)
+		max(z$v)
+	}, peak$start, peak$end)
+	peak.twi.max <- mapply(function(x, y) {
+		z <- subset(df, date >= x & date <= y)
+		max(z$twi)
+	}, peak$start, peak$end)
+	
+	## peak mean
+	peak.v.mean <- mapply(function(x, y) {
+		z <- subset(df, date >= x & date <= y)
+		mean(z$v)
+	}, peak$start, peak$end)
+	peak.twi.mean <- mapply(function(x, y) {
+		z <- subset(df, date >= x & date <= y)
+		mean(z$twi)
+	}, peak$start, peak$end)
+	
+	## peak start day
+	## peak end day
+	## peak ndays
+	
+	### Get information from after the peak
+	
+	## post-peak start
+	post.start <- sapply(1:nrow(peak), function(x) {
+		peak$end[x] + 1
+	}, simplify=FALSE)
+	post.start <- do.call(c, post.start)
+	
+	## post-peak end
+	post.end <- sapply(1:nrow(peak), function(x) {
+		if(x == nrow(peak)) {
+			res <- df$date[nrow(df)] 
+		} else {
+			res <- peak$start[x +1] - 1
+		}
+		return(res)
+	}, simplify=FALSE)
+	post.end <- do.call(c, post.end)
+	
+	## post-peak mean
+	post.v.mean <- mapply(function(x, y) {
+		z <- subset(df, date >= x & date <= y)
+		mean(z$v)
+	}, post.start, post.end)
+	post.twi.mean <- mapply(function(x, y) {
+		z <- subset(df, date >= x & date <= y)
+		mean(z$twi)
+	}, post.start, post.end)
+	
+	
+	### Outcome of interest
+	outcome <- 100 * (post.v.mean - pre.v.mean) / (peak.v.max - pre.v.mean)
+	
+	### Group results
+	res <- cbind(peak, pre.start, pre.end, pre.v.max, pre.twi.max, pre.v.min, pre.twi.min, pre.v.tot, pre.twi.tot, pre.v.mean, pre.twi.mean, pre.v.sd, pre.twi.sd, pre.ndays, pre.posts, pre.posts.day, peak.author, peak.posts.cont.mean, peak.posts.cont.max, peak.posts.cont.min, peak.v.max, peak.twi.max, peak.v.mean, peak.twi.mean, post.start, post.end, post.v.mean, post.twi.mean, outcome)
+	
+	## Done!
+	return(res)
+}
+
+peakRefine <- function(peak, df, post) {
+	i <- which(peak$peak.v.max - peak$pre.v.mean <= 0)
+	if(length(i) > 0) {
+		print(i)
+		res <- completePeaks(peak[-i, c("start", "end", "ndays")], df, post)
+		if(sum(res$peak.v.max - res$pre.v.mean <= 0) > 0) {
+			res <- peakRefine(res, df, post)
+		}
+	} else {
+		res <- peak
+	}
+	rownames(res) <- 1:nrow(res)
+	return(res)
+}
+peaks.95.2 <- peakRefine(completePeaks(p95.2, simply, posts), simply, posts)
+
+p80.2 <- getPeaks(simply, diff, 0.80, 2)
+peaks.80.2 <- peakRefine(completePeaks(p80.2, simply, posts), simply, posts)
+
+p80 <- getPeaks(simply, diff, 0.80)
+peaks.80 <- peakRefine(completePeaks(p80, simply, posts), simply, posts)
+mean(peaks.80$outcome)
+
+
+### Test several things quickly
+
+## Fix the data for those 5 weird days by adding the mean of the days of that month before the crash
+simply$v[ simply$date >= "2012-12-13" & simply$date <= "2012-12-17"]  <- simply$vTum[ simply$date >= "2012-12-13" & simply$date <= "2012-12-17"] + mean(simply$vWP[ simply$date >= "2012-12-01" & simply$date <= "2012-12-12"])
+
+
+## 0.9, 20, 5[10]
+## 0.7, 50, 10
+q <- 0.7
+test.diff <- simply$v - getRunMeans(window = 50)$mean
+plot(simply$date, test.diff, col = ifelse(test.diff > quantile(test.diff, q), "blue", "orange"))
+plot(simply$date, simply$v, col = ifelse(test.diff > quantile(test.diff, q), "blue", "orange"))
+test.peaks <- getPeaks(simply, test.diff, q, 7) 
+test.res <- peakRefine(completePeaks(test.peaks, simply, posts), simply, posts)
+mean(test.res$outcome)
+sd(test.res$outcome)
+test.res$outcome
+test.res$post.v.mean - test.res$pre.v.mean
+test.res$peak.v.max - test.res$pre.v.mean
+```
+
+
+Now, lets see how to answer the second part of the question regarding which factors are important
+```{r}
+use <- test.res
+use$peak.nposts <- rowSums(use[, c("Roger", "Rafa", "Jeff")])
+hist(use$outcome)
+plot(density(use$outcome))
+
+plot(use$peak.posts.cont.max, use$outcome)
+plot(use$peak.posts.cont.mean, use$outcome)
+plot(use$peak.twi.max, use$outcome)
+plot(use$peak.twi.mean, use$outcome)
+
+fit <- lm(outcome ~ start + pre.v.mean + pre.twi.mean + Roger + Rafa + Jeff + peak.posts.cont.max + peak.v.max + peak.twi.max, data = use)
+summary(fit)
+
+f1 <- lm(outcome ~ peak.posts.cont.max, data = use)
+summary(f1)
+f2 <- lm(outcome ~ peak.twi.max + peak.posts.cont.max, data = use)
+summary(f2)
+anova(f1, f2)
+f3 <- lm(outcome ~ peak.posts.cont.max + peak.nposts, data = use)
+summary(f3)
+anova(f1, f3)
+f4 <- lm(outcome ~ peak.posts.cont.max + peak.twi.mean, data = use)
+summary(f4)
+anova(f1, f4)
+f5 <- lm(outcome ~ peak.twi.mean, data = use)
+summary(f5)
+f6 <- lm(outcome ~ peak.posts.cont.max + peak.nposts + peak.twi.mean, data = use)
+summary(f6)
+```
+
+
 
 
