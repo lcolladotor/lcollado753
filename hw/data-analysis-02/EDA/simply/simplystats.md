@@ -134,7 +134,7 @@ barplot(table(posts$cont))
 ```r
 
 ## Save posts for later use
-save(posts, file = "../../data/posts.controvery.proc.Rdata", compress = "gzip")
+save(posts, file = "../../data/posts.controversy.proc.Rdata", compress = "gzip")
 ```
 
 

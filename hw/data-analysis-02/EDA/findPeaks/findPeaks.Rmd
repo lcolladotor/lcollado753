@@ -4,7 +4,7 @@ Find Peaks
 ```{r}
 ## Load data
 load("../../data/simply.Rdata")
-load("../../data/posts.controvery.proc.Rdata") ## Typo on the name >.<
+load("../../data/posts.controversy.proc.Rdata")
 
 ## Calculate running means by 5 days
 runmeans <- data.frame(start = simply$date -2, end = simply$date + 2, mean = rep(NA, nrow(simply)))
@@ -63,4 +63,9 @@ qqnorm(norm)
 qqline(norm, col="red")
 ## Hard to interpret T_T'
 
+## Boxplot looks symmetric
+boxplot(norm)
+
+## Shapiro Test (shouldn't take it's results much into account) indicate that it's not normal
+shapiro.test(norm)
 ```
