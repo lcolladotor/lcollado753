@@ -106,11 +106,11 @@ with(posts, boxplot(cont ~ factor(author)))
 f <- lm(cont ~ factor(author), data = posts)
 summary(f)
 anova(f)
-## pvalue of 0.2301 hmm
+## very low p-value, butat that seems to be due to Steven's post
 f2 <- lm(cont ~ factor(author), data = posts, subset = author %in% c("Jeff Leek", "Rafael Irizarry", "Roger Peng"))
 summary(f2)
 anova(f2)
-## Ok, now Roger's posts seem different!!
+## Ok, now all of the authors seem different!!
 
 ## Lets look at the Jeff vs Rafa vs Roger
 table(posts$author)
@@ -118,7 +118,13 @@ posts.filt <- subset(posts, author %in% c("Jeff Leek", "Rafael Irizarry", "Roger
 t.test(posts.filt$cont ~ posts.filt$author == "Roger Peng")
 t.test(posts.filt$cont ~ posts.filt$author == "Jeff Leek")
 t.test(posts.filt$cont ~ posts.filt$author == "Rafael Irizarry")
-## Only Jeff is significantly different from the other 2. I mean, Jeff vs (Roger + Rafa). 
+## Only Jeff is not significantly different from the other 2. I mean, Jeff vs (Roger + Rafa). 
+
+t.test(posts.filt$cont[posts.filt$author == "Roger Peng"], posts.filt$cont[posts.filt$author == "Rafael Irizarry"])
+t.test(posts.filt$cont[posts.filt$author == "Roger Peng"], posts.filt$cont[posts.filt$author == "Jeff Leek"])
+t.test(posts.filt$cont[posts.filt$author == "Rafael Irizarry"], posts.filt$cont[posts.filt$author == "Jeff Leek"])
+
+## So, Rafa posts the most controversial posts followed by Jeff and finally Roger.
 ```
 
 
