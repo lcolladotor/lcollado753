@@ -45,7 +45,7 @@ summary(posts)
 ##  Length:511         Min.   :1.00   Min.   :1.00  
 ##  Class :character   1st Qu.:1.00   1st Qu.:1.00  
 ##  Mode  :character   Median :1.00   Median :1.00  
-##                     Mean   :1.68   Mean   :1.62  
+##                     Mean   :1.62   Mean   :1.56  
 ##                     3rd Qu.:2.00   3rd Qu.:2.00  
 ##                     Max.   :5.00   Max.   :5.00
 ```
@@ -104,13 +104,13 @@ t.test(posts$leo1, posts$leo2, paired = TRUE)
 ## 	Paired t-test
 ## 
 ## data:  posts$leo1 and posts$leo2 
-## t = 2.455, df = 510, p-value = 0.01442
+## t = 2.936, df = 510, p-value = 0.00348
 ## alternative hypothesis: true difference in means is not equal to 0 
 ## 95 percent confidence interval:
-##  0.01212 0.10921 
+##  0.01942 0.09800 
 ## sample estimates:
 ## mean of the differences 
-##                 0.06067
+##                 0.05871
 ```
 
 ```r
