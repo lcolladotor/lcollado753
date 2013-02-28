@@ -7,6 +7,7 @@ load("../../data/simply.Rdata")
 load("../../data/posts.controversy.proc.Rdata")
 
 ## Calculate running means by 5 days
+## I ran this with +-3 days and the results look worse in the sense that many peaks are next to each other.
 runmeans <- data.frame(start = simply$date -2, end = simply$date + 2, mean = rep(NA, nrow(simply)))
 for(i in 1:nrow(runmeans)) {
 	runmeans$mean[i] <- mean(simply$v[ simply$date >= runmeans$start[i] & simply$date <= runmeans$end[i] ])
@@ -68,4 +69,116 @@ boxplot(norm)
 
 ## Shapiro Test (shouldn't take it's results much into account) indicate that it's not normal
 shapiro.test(norm)
+
+## Summary info
+summary(norm)
+
+## Surprinsingly bad results!
+plot(simply$date, simply$v, col = ifelse(norm> quantile(norm, 0.9), "blue", "orange"))
 ```
+
+
+Taking a step back and looking at how the peaks would be using the quantile 0.9 for diff.
+
+```{r}
+plot(simply$date, simply$v, col = ifelse(diff> quantile(diff, 0.9), "blue", "orange"))
+## Looks like some peaks are too close to each other
+diff(simply$date[diff> quantile(diff, 0.9)])
+## 69 posts in those peak days out of 511 total
+dim(posts[posts$date %in% simply$date[diff> quantile(diff, 0.9)], ])
+
+## It's 10% days vs 13.5% posts
+sum(diff > quantile(diff, 0.9)) / length(diff)
+69 / nrow(posts)
+
+# quantile 0.95?
+plot(simply$date, simply$v, col = ifelse(diff> quantile(diff, 0.95), "blue", "orange"))
+diff(simply$date[diff> quantile(diff, 0.95)])
+sum(diff > quantile(diff, 0.95)) 
+```
+
+Looking at differences between the authors
+```{r}
+
+## Ahh, is the controversy related to the author?
+tapply(posts$cont, posts$author, mean)
+with(posts, boxplot(cont ~ factor(author)))
+f <- lm(cont ~ factor(author), data = posts)
+summary(f)
+anova(f)
+## pvalue of 0.2301 hmm
+f2 <- lm(cont ~ factor(author), data = posts, subset = author %in% c("Jeff Leek", "Rafael Irizarry", "Roger Peng"))
+summary(f2)
+anova(f2)
+## Ok, now Roger's posts seem different!!
+
+## Lets look at the Jeff vs Rafa vs Roger
+table(posts$author)
+posts.filt <- subset(posts, author %in% c("Jeff Leek", "Rafael Irizarry", "Roger Peng"))
+t.test(posts.filt$cont ~ posts.filt$author == "Roger Peng")
+t.test(posts.filt$cont ~ posts.filt$author == "Jeff Leek")
+t.test(posts.filt$cont ~ posts.filt$author == "Rafael Irizarry")
+## Only Jeff is significantly different from the other 2. I mean, Jeff vs (Roger + Rafa). 
+```
+
+
+Ok, time to get the peaks for quantiles 0.9 and 0.95
+```{r}
+
+## Function that gets the start and end
+limitPeak <- function(df) {
+	data.frame(start = df$date[1], end = df$date[nrow(df)])
+}
+## Main function for finding the peaks
+getPeaks <- function(df, diff, q, space = 1) {
+	i <- which(diff > quantile(diff, q))
+	dates <- df$date[i]
+	dates.diff <- diff(dates)
+	
+	## For peaks far from each other find the start and end date of the peak
+	j <- which(dates.diff <= space)
+	good <- i[-c(j, j+1)]
+	res <- lapply(good, function(x) {
+		limitPeak(df[x,])
+	})
+	res <- do.call(rbind, res)
+
+	## In peaks too close to each other, find the day with the highest value and call it the peak day
+	if(length(j) > 0) {
+		while(length(j) > 0) {
+			k <- j[1]
+			j <- j[-1]
+			if(length(j) > 0) {
+				while(j[1] - k[length(k)] == 1) {
+					k <- c(k, j[1])
+					j <- j[-1]
+					if(length(j) == 0) break
+				}
+			}
+			info <- df[i[c(k, k[length(k)]+1)],]
+			res <- rbind(res, limitPeak(info))
+			## Now that we have the k groups
+		}
+	}
+	
+	## End
+	res <- res[order(res$start), ]
+	res$ndays <- as.integer(res$end - res$start) + 1
+	return(res)
+}
+
+## Gets the peaks for quantile .9 and 0.95 for the difference.
+## Compare with space =1 and space = 2
+p95 <- getPeaks(simply, diff, 0.95)
+p95.2 <- getPeaks(simply, diff, 0.95, 2)
+p90 <- getPeaks(simply, diff, 0.90)
+p90.2 <- getPeaks(simply, diff, 0.90, 2)
+
+## Checking posts in that large peak
+subset(posts, date >= "2012-11-26" & date <= "2012-11-29")
+
+```
+
+Proceed
+
+

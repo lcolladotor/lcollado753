@@ -24,10 +24,10 @@ for(j in 1:length(i)) {
 	msg <- paste("How controversial is this title:", posts$title[i[j]])
 	print(msg)
 	rank <- as.integer(readline("Enter your controversy ranking. 1 to 5 (integers). 5 is very controversial. "))
-	res[j] <- rank
+	res[i[j]] <- rank
 }
 print("You are done!")
-new <- data.frame(res)
+new <- data.frame(as.integer(res))
 colnames(new) <- col.name
 posts <- cbind(posts, new)
 save(posts, file="posts.controversy.Rdata", compress="gzip")
