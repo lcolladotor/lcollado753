@@ -31,6 +31,9 @@ posts$cont <- rowMeans(posts[, c("leo1", "leo2")])
 
 ## Exploring the mean controversy ranking
 barplot(table(posts$cont))
+
+## Save posts for later use
+save(posts, file="../../data/posts.controvery.proc.Rdata", compress="gzip")
 ```
 
 

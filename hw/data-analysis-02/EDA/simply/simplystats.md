@@ -131,5 +131,11 @@ barplot(table(posts$cont))
 
 ![plot of chunk unnamed-chunk-1](figure/unnamed-chunk-15.png) 
 
+```r
+
+## Save posts for later use
+save(posts, file = "../../data/posts.controvery.proc.Rdata", compress = "gzip")
+```
+
 
 
