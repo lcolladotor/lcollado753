@@ -9,7 +9,7 @@ Order of scripts
 # Data pre-processing
 
 1. data/simplify.R
-2. data/run_controvery.R
+2. data/run_controvery.R (twice)
 3. data/simplify_split.R
 
 # EDA
