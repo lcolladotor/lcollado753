@@ -4,7 +4,12 @@ Exploring the simplystats data
 
 ```{r}
 ## Load data
-load("../../data/simplified.Rdata")
+load("../../data/simply.Rdata")
+load("../../data/posts.controversy.Rdata")
+
+## Basic exploration
+summary(simply)
+summary(posts)
 
 ## Visits vs time
 plot(simply$date, simply$v, col=ifelse(simply$post, "blue", "orange"))
@@ -12,6 +17,20 @@ plot(simply$date, simply$v, col=ifelse(simply$post, "blue", "orange"))
 ## Twitter visits vs time
 plot(simply$date, simply$twi, col=ifelse(simply$post, "forest green", "purple"))
 
+## No difference in the mean number of visitors for days with posts vs without
+boxplot(simply$v ~ simply$post)
+t.test(simply$v ~ simply$post)
+
+## Looking at how I ranked the controversy of the posts
+t.test(posts$leo1, posts$leo2, paired=TRUE)
+barplot(table(posts$leo1 - posts$leo2))
+
+## Mean controvery ranking
+posts$leo2 <- as.integer(posts$leo2)
+posts$cont <- rowMeans(posts[, c("leo1", "leo2")])
+
+## Exploring the mean controversy ranking
+barplot(table(posts$cont))
 ```
 
 
