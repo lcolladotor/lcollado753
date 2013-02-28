@@ -18,3 +18,7 @@ Order of scripts
 2. EDA/fell/fell_EDA.Rmd
 3. EDA/simplystats.Rmd Note that it also does a tiny bit of pre-processing
 4. EDA/findPeaks/findPeaks.Rmd This uses the file EDA/functions.R
+
+# Report
+
+1. report/data_02_lcollado.Rnw

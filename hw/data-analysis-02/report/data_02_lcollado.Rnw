@@ -80,7 +80,200 @@ options(width=90)
 % \end{titlepage}
 
 %%%%%%%%%% Write document %%%%%%%%%%%%%%
+\section{Introduction}
 
+SimplyStatistics is a blog ran by three faculty members of the Johns Hopkins School of Public Health Biostatistics Department. It has been live since late 2011 and has been hosted under the Tumblr and WordPress platforms. The administrators of the blog have visitors data given by Google Analytics including information on referrals from Twitter. This blog, online at \url{http://simplystatistics.org/}, is one of the most popular statistics blog in terms of number of visits. These bloggers are interested in knowing what is the expected fraction of visitors they retain after a spike in the number of visitors. Additionally, they want to know if there are any factors that influence such fraction.
+
+\section{Pre-processing}
+
+The initial visitors data was given to us by Jeffrey Leek. To complement this information, I scrapped from their Tumblr and WordPress sites the author, date and title of their posts. Furthermore, I acquired the Google Analytics data for the blog Fellgernon Bit available at \url{http:://fellgernon.tumblr.com}. I also scrapped the date of the posts. However, since some posts were moved to \url{http://fellger.tumblr.com}, I also scraped the relevant post dates from that site. 
+
+The original SimplyStatistics data is split from their two sites, so for simplicity I merged their visitor information by date while still keeping the visits separate from the twitter information. I used the dates from the Tumblr site up until they moved to WordPress, and then switched to WordPress. Similarly for the authors and titles of the posts.
+
+Finally, I ranked on a 1 to 5 scale the \emph{controversy} level of the title of each of the 511 posts. I did so by permuting the titles to avoid any temporal bias and repeated the procedure once in an effort to be more consistent in the ranking. Note that the author name was blind when doing this process.
+
+\section{Exploratory data analysis}
+
+\subsection{Fellgernon Bit}
+
+<<fell, fig.cap="Number of visits to Fellgernon Bit per day. Points are colored according to whether a post was made that day or not. Linear model fit (blue line) of visits explained by date along with confidence bands.", out.width='.55\\linewidth'>>=
+
+## Load data
+load("../data/fell.Rdata")
+
+## Load plotting lib
+library(ggplot2)
+ggplot(fell, aes(x=date, y=visits, color=post)) + geom_point() +xlab("Date") + ylab("Number of visitors") + stat_smooth(method=lm, colour="blue")
+
+@
+
+
+<<felltest>>=
+
+## Lets compare days of the post and 2 days after vs rest
+postDays <- function(df, day) {
+    days <- df$date[df$post]
+    new <- sapply(2:day, function(x) {
+        days + x
+    }, simplify = FALSE)
+    all <- sort(c(days, do.call(c, new)))
+    add <- data.frame(df$date %in% all)
+    colnames(add) <- paste0("post", day)
+    cbind(df, add)
+}
+## Marc days with posts (and the day after too)
+fell2 <- postDays(fell, 2)
+
+fell.test0 <- t.test(fell$visit ~ fell$post)
+pval <- fell.test0$p.value
+ci <- round(as.vector(fell.test0$conf.int), 3)
+ci <- paste0("(", ci[1], ",", ci[2], ")")
+
+fell.test <- t.test(fell$visit[!fell$post], fell2$visit[!fell2$post2])
+pval2 <- fell.test$p.value
+ci2 <- round(as.vector(fell.test$conf.int), 3)
+ci2 <- paste0("(", ci2[1], ",", ci2[2], ")")
+@
+
+
+
+Using the data from Fellgernon Bit I was able to determine the minimum level that posting has in creating a spike in the number of visitors. The data from this blog is useful to answer this question because posts are made sporadically and we can consider the visitors on non-post days as mostly noise as shown in Figure \ref{fig:fell}. The difference in mean number of visitors on post days vs non post days is significant (two-sided T-test, p-value \Sexpr{pval}, 95\% CI: \Sexpr{ci}). Furthermore, the two sided t-Test for a difference in means for the number of visitors during non-post days versus non-post days excluding in addition the day after a post is published is non-significant (p-value \Sexpr{pval2}, 95\% CI: \Sexpr{ci2}). Therefore, at the very least, posting drives visitors into a blog the day the post is made.
+
+\subsection{SimplyStatistics}
+
+<<time, fig.cap="Number of visits to Simply Statistics per day. Points are colored according to whether a post was made that day or not. Linear model fit (blue line) of visits explained by date along with confidence bands.", out.width='.55\\linewidth'>>=
+
+## Load data
+load("../data/simply.Rdata")
+load("../data/posts.controversy.proc.Rdata")
+ggplot(simply, aes(x=date, y=v, color=post)) + geom_point() + ylab("Visits (Tumblr + WordPress)") + stat_smooth(method=lm, colour="blue") + xlab("Date")
+
+## Fix the data for those 5 weird days by adding the mean of the days of that month before the crash
+simply$v[ simply$date >= "2012-12-13" & simply$date <= "2012-12-17"]  <- simply$vTum[ simply$date >= "2012-12-13" & simply$date <= "2012-12-17"] + mean(simply$vWP[ simply$date >= "2012-12-01" & simply$date <= "2012-12-12"])
+@
+
+In Figure \ref{fig:time} there are three observations to be made. First, that the overall trend os the number of visitors is positive as shown by the linear regression fit\footnote{It is not completely appropriate since it can go into negative values. But it serves it's illustrative purpose.}. Secondly, there are posts made the majority of the days in the time under study. So a more elaborated way of choosing the peaks is needed rather than just select days with posts made. Third, there is some data missing at the end of 2012. To fix the five days where Google Analytics failed for WordPress, I considered using the mean from the previous days of the month and the data from Tumblr.
+
+<<cont, fig.cap="Histogram of the controversy value of the SimplyStatitics post titles. Data used is the mean from two replicates of the rankings where 5 is a highly controversial and 1 is not considered controversial at all.", out.width='.55\\linewidth', message=FALSE>>=
+ggplot(posts, aes(x = cont)) + geom_bar() + xlab("Controversy value") + ylab("Frequency")
+@
+
+<<author>>=
+
+posts.filt <- subset(posts, author %in% c("Jeff Leek", "Rafael Irizarry", "Roger Peng"))
+a1 <- t.test(posts.filt$cont[posts.filt$author == "Roger Peng"], posts.filt$cont[posts.filt$author == 
+    "Rafael Irizarry"])
+a2<- t.test(posts.filt$cont[posts.filt$author == "Roger Peng"], posts.filt$cont[posts.filt$author == 
+	   "Jeff Leek"])
+a3<- t.test(posts.filt$cont[posts.filt$author == "Rafael Irizarry"], posts.filt$cont[posts.filt$author == 
+	   "Jeff Leek"])
+@
+
+Figure \ref{fig:cont} explores the results from the \emph{controversy} of the titles. Most of the titles do not seem to be controversial and only a handful are highly controversial. However, the interesting part is that the mean controversy scores for the posts are \Sexpr{a1$estimate[2]}, \Sexpr{a2$estimate[2]}, \Sexpr{a1$estimate[1]} and for Rafael Irizarry, Jeffrey Leek, and Roger Peng respectively. All the pairwise differences are statistically significant (two-sided t-Tests p-values: Roger vs Rafa \Sexpr{a1$p.value}, Roger vs Jeff \Sexpr{a2$p.value}, Rafa vs Jeff \Sexpr{a3$p.value}). This could be further improved by looking at the posts themselves since many of them do not have a title.
+
+\section{Results}
+
+
+\subsection{Finding the peaks}
+
+<<peaks, fig.cap="(Top) Number of visits minus the running mean by date. (Bottom) Number of visits by date. In both, the color is given by whether the observation it passes as a candidate peak or not. ", out.width='.6\\linewidth', dependson="fit">>=
+
+## Load functions
+source("../EDA/functions.R")
+
+## Find peaks
+q <- 0.9
+diff <- simply$v - getRunMeans(window = 20)$mean
+test.peaks <- getPeaks(simply, diff, q, 10)
+peaks <- peakRefine(completePeaks(test.peaks, simply, posts), simply, posts)
+
+## Find peaks2
+q <- 0.7
+diff2 <- simply$v - getRunMeans(window = 50)$mean
+test.peaks2 <- getPeaks(simply, diff2, q, 7)
+peaks2 <- peakRefine(completePeaks(test.peaks2, simply, posts), simply, posts)
+
+## Difference between max during peak and max before peak
+peaks2$twi.max.diff <- peaks2$peak.twi.max - peaks2$pre.twi.max
+
+## Arrange data
+data <- cbind(simply, diff, "pass" = diff > quantile(diff, q))
+
+## Load package
+suppressMessages(library(gridExtra))
+
+## Plot peaks EDA
+a <- ggplot(data, aes(x=date, y=diff, color=pass)) + geom_point() + xlab("Date") + ylab("Difference vs 41 days running mean")
+b <- ggplot(data, aes(x=date, y=v, color=pass)) + geom_point() + xlab("Date") + ylab("Number of visits")
+grid.arrange(a, b)
+
+@
+
+To find the peaks I used a method based on running means. First, I calculated the running mean for each day $\pm$ a window of size $w$. Then, I calculated the value at a given day minus it's corresponding running mean. From this difference, I then chose those beyond a quantile $q$ as possible peaks. This is shown in Figure \ref{fig:peaks} (top panel). The candidates seem reasonable under various $w$ and $q$ (data only shown for $w = 20, q = 0.9$). We can see this in Figure \ref{fig:peaks} (bottom panel) because the colors don't mix and it's only the high values that are shown as candidate peaks. Next, I merged the candidate peaks that were within $d$ days of each other (Figure \ref{fig:peaks} uses $d = 10$). In this case, the procedure reduced from \Sexpr{sum(data$pass)} candidate peaks to \Sexpr{nrow(peaks)} peaks. Choosing $d$ is tricky since it can lead to wide peaks if using a large value, but a low value can fail to detect the peaks specially under highly variable periods such as the data for 2013.
+
+
+
+
+
+
+
+\subsection{Outcome of interest}
+
+<<outcome>>=
+res <- c(mean(peaks$outcome), sd(peaks$outcome))
+out <- t.test(peaks$outcome)
+ci <- round(as.vector(out$conf.int), 3)
+ci <- paste0("(", ci[1], ",", ci[2], ")")
+
+res2 <- c(mean(peaks2$outcome), sd(peaks2$outcome))
+out2 <- t.test(peaks2$outcome)
+ci2 <- round(as.vector(out2$conf.int), 3)
+ci2 <- paste0("(", ci2[1], ",", ci2[2], ")")
+@
+
+The main outcome of interest is the expected fraction of visitors that SimplyStatistics retains after a spike in the number of visitors. For each peak, I calculated this fraction by
+\begin{equation}
+	Y_p = 100 * \frac{\bar{c_p} - \bar{a_p}}{ \max_j \left\{ b_{pj} \right\} -\bar{a_p} }. \label{interest}
+\end{equation}
+Where $a_{pi}$ is the number of visitors for day $i$ where $i$ is in the days before the peak $p$ up to the previous peak $p-1$ (not included). $b_{pj}$ is the number of visitors for day $j$ where $j$ is in the days from the peak $p$. Finally, $c_{pk}$ is the number of visitors for day $k$ where $k$ is in the days after the peak $p$ up to the next peak $p +1 $(not included). 
+
+Think of $a, b, c$ as before, during and after the peak. Thus, the numerator of $Y_p$ is the difference between the mean after the peak and before the peak. The denominator is the difference of the maximum height of the peak versus the mean before the peak. Thus, $Y_p$ is the percent of visitors at a pinnacle of the peak immediately retained after a peak.
+
+Using $w = 20, q = 0.9, d = 10$ (option 1), the mean $\bar{y}$ of the random sample is \Sexpr{res[1]} with standard deviation \Sexpr{res[2]}. The null hypothesis that $\bar{y} = 0$ is rejected using a two-sided t-Test (p-value \Sexpr{out$p.value}, and 95\% CI \Sexpr{ci}). Using $w = 50, q = 0.7, d = 7$ (option 2) the results are similar with $\bar{y} = $ \Sexpr{res2[1]} and significantly different from 0 (p-value \Sexpr{out2$p.value}, and 95\% CI \Sexpr{ci2}). Further analysis is needed for determining which values of $w, q, d$ to use and it's impact on the peaks' width. 
+
+\subsection{Important factors}
+
+I calculated several metrics for each peak such as the number of posts by author during the peak, the maximum controversial title ranking of a post during the peak, the difference between the maximum number of twitter visitors during the peak versus the maximum number of twitter visitors immediately before the peak, among others. However, none of these factors was significantly associated with the outcome of interest $Y_p$ using linear regression with the peaks from option 1. 
+
+Using the peaks from option 2 did yield one significant association. It's between the outcome of interest and the most controversial title post made during that peak\footnote{Abbreviated as \emph{peak.posts.cont.max}.} as shown in Table \ref{tab:lm1} and illustrated in Figure \ref{fig:contmax}. It's the model
+\begin{equation}
+	Y = \beta_0 + \beta_1 (peak.posts.cont.max) + \epsilon, \quad \epsilon \sim N(0, \sigma^2). \label{model}
+\end{equation} 
+ Option 2 results in wider peaks than option 1 and thus polls more information during the peaks. This can potentially explain the difference between the results. Nevertheless, other factors were not significantly associated with the outcome of interest.
+
+It is interesting to note that the association shown in Figure \ref{fig:contmax} has a negative slope. The immediate interpretation is that SimplyStatistics losses visitors after a peak that was driven by controversial posts. However, further analysis are needed to confirm or disregard this claim.
+
+<<contmax, fig.cap="Outcome of interest vs the controversial rating of the most controversial post during the peak. Observations are shown in purple with alpha $1/2$. Linear regression curve is shown in blue along confidence bands.",  out.width='.55\\linewidth'>>=
+ggplot(peaks2, aes(x=peak.posts.cont.max, y=outcome)) + geom_point(alpha=1/2, color="purple", size=3) + geom_smooth(method="lm") + ylab(expression("Y"["p"])) + xlab("Most controversial post during the peak")
+@
+
+<<fit, results='asis'>>=
+library(xtable)
+
+## Some linear regression results
+fit <- lm(outcome ~ peak.posts.cont.max, data = peaks2)
+print(xtable(summary(fit), caption="Linear regression summary results for model \\eqref{model}.", label="tab:lm1", digits = 4), size="footnotesize")
+
+#fit2 <- lm(outcome ~ peak.posts.cont.max + Roger + Rafa + Jeff + peak.twi.max , data = peaks2)
+#print(xtable(summary(fit2), caption="Linear regression summary results.", label="tab:lm2", digits = 4), size="footnotesize")
+
+@
+
+
+\section{Conclusions}
+The number of visitors for SimplyStatistics has been growing over time. Having very active bloggers is most likely helping keep this trend positive. Over the course of it's existence, SimplyStatistics has had several peaks in the number of visitors. Using two sets of parameters to find the peaks resulted in significant results for the outcome of interest $Y_p$ defined in \eqref{interest}. The 95\% intervals are \Sexpr{ci} and \Sexpr{ci2} with mean \Sexpr{res[1]} and \Sexpr{res2[1]} respectively. Thus, depending on the peaks used, the expected number of visitors that give rise to a peak and that then return to the site is approximately 6\% or 8\%.
+
+It is difficult to determine if any factor explains the outcome of interest $Y_p$. However, ranking the controversiality level of the post titles at random and blind from the author's name is potentially associated with $Y_p$. This result has to be interpreted carefully since the person doing the ranking has read nearly all of the posts of SimplyStatistics and is thus extracting more information from the title than someone who is seeing the titles for the first time. Nevertheless, this finding is interesting. Specially because more controversial titles can be detrimental to SimplyStatistics' interest of increasing it's fan base.
 
 \section{Acknowledgements}
 Discussed the general idea of how to analyze the data with Jiawei Bai and James Pringle. I tried to emulate the peak finder Jiawei described. 
