@@ -1,0 +1,66 @@
+Find Peaks
+=========
+
+```{r}
+## Load data
+load("../../data/simply.Rdata")
+load("../../data/posts.controvery.proc.Rdata") ## Typo on the name >.<
+
+## Calculate running means by 5 days
+runmeans <- data.frame(start = simply$date -2, end = simply$date + 2, mean = rep(NA, nrow(simply)))
+for(i in 1:nrow(runmeans)) {
+	runmeans$mean[i] <- mean(simply$v[ simply$date >= runmeans$start[i] & simply$date <= runmeans$end[i] ])
+}
+
+## Some EDA on the running means
+plot(simply$date, runmeans$mean)
+plot(simply$v, runmeans$mean)
+## This one looks useful to choose the peaks
+plot(simply$v - runmeans$mean)
+abline(h=0, col="red")
+
+diff <- simply$v - runmeans$mean
+plot(density(diff))
+summary(diff)
+## Not normal
+qqnorm(diff)
+
+## Exploring the simply > 0 cutoff
+plot(simply$date, simply$v, col = ifelse(diff>0, "blue", "orange"))
+## It doesn't look great as some high values are marked in orange.
+## But in another sense, blue values are higher than orange ones.
+
+## Looking at this in another way
+boxplot(simply$v ~ diff>0)
+t.test(simply$v ~ diff>0)
+## Good significant difference
+table(diff > 0)
+
+### Time to find a better cutoff.
+
+## 3rd quantile?
+plot(simply$date, simply$v, col = ifelse(diff> quantile(diff, 0.75), "blue", "orange"))
+table(diff > quantile(diff, 0.75))
+
+## .9 quantile?
+plot(simply$date, simply$v, col = ifelse(diff> quantile(diff, 0.9), "blue", "orange"))
+table(diff > quantile(diff, 0.9))
+boxplot(simply$v ~ diff > quantile(diff, 0.9))
+t.test(simply$v ~ diff > quantile(diff, 0.9))
+
+
+## Lets take into accout the variation during the windows
+runmeans$sd <- rep(NA, nrow(simply))
+for(i in 1:nrow(runmeans)) {
+	runmeans$sd[i] <- sd(simply$v[ simply$date >= runmeans$start[i] & simply$date <= runmeans$end[i] ])
+}
+
+## Looks more "Normal" as expected
+plot((simply$v - runmeans$mean)/runmeans$sd)
+
+norm <- (simply$v - runmeans$mean)/runmeans$sd
+qqnorm(norm)
+qqline(norm, col="red")
+## Hard to interpret T_T'
+
+```
