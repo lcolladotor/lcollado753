@@ -29,4 +29,12 @@ plot(res$data, res$outlierFunction(res$data), main = "lcollado")
 
 ![plot of chunk unnamed-chunk-1](figure/unnamed-chunk-1.png) 
 
+```r
+
+
+## For Jeff to play with our outliers functions
+tmp <- res
+save(tmp, file = "lcollado_tmp.Rdata")
+```
+
 

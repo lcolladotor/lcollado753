@@ -26,5 +26,10 @@ load("res.Rdata")
 ## Make a plot of the outliers
 plot(res$data, res$outlierFunction(res$data), main="lcollado")
 
+
+## For Jeff to play with our outliers functions
+tmp <- res
+save(tmp, file="lcollado_tmp.Rdata")
+
 ```
 
