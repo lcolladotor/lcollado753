@@ -1,0 +1,128 @@
+% Document type and font specification
+\documentclass[11pt]{article}
+
+% Margin specification
+% Check http://en.wikibooks.org/wiki/LaTeX/Page_Layout for more info
+\usepackage[margin = 1in]{geometry}
+\usepackage[nottoc,notlof,notlot,numbib]{tocbibind}
+
+% Some misc and math packages
+% Check http://en.wikibooks.org/wiki/LaTeX/Mathematics for more info
+\usepackage{fancyhdr}
+\usepackage{manfnt}
+\usepackage{pgf}
+\usepackage{amsmath,amsthm,amssymb,natbib,graphicx}
+\usepackage{amsfonts}
+\DeclareMathAlphabet{\mathpzc}{OT1}{pzc}{m}{it}
+\usepackage{bbm}
+\usepackage{float}
+\usepackage{mathrsfs} %mathscr{A}
+\usepackage{hyperref,graphicx}
+
+% Color
+\usepackage{color}
+
+% For specifying the counter style of enumerate
+\usepackage{enumerate}
+
+% Page style definition
+\pagestyle{fancy}
+% Customize this to your liking.
+\lhead{}\chead{}\rhead{By \myurlshort{http://biostat.jhsph.edu/~lcollado/}{L. Collado-Torres}}\lfoot{}\cfoot{\thepage}\rfoot{\today}
+
+% Line space
+\usepackage{setspace}
+% Default is normal, but un-comment below to your liking
+% \onehalfspacing
+% \doublespacing
+
+% Caption and figure def
+% Check http://en.wikibooks.org/wiki/LaTeX/Floats,_Figures_and_Captions for more info
+\usepackage[font=small,labelfont=bf]{caption}
+\usepackage{wrapfig}
+
+% Math theorems shortcuts
+% Check http://en.wikibooks.org/wiki/LaTeX/Theorems for more info
+\usepackage{mathtools}
+\newtheorem{thm}{Theorem}
+\newtheorem{lem}{Lemma}[thm]
+\newtheorem{cor}{Corollary}[thm]
+\newtheorem{defi}{Definition}
+\newtheorem{conj}{Conjecture}
+\newtheorem{prop}{Proposition}
+\newtheorem{ex}{Example}
+\newtheorem{claim}{Claim}
+\newtheorem{fact}{Fact}
+\renewcommand{\qedsymbol}{$\blacksquare$}
+
+% Some inherited commands
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
+\newcommand{\myurlshort}[2]{\href{#1}{\textcolor{gray}{\textsf{#2}}}}
+
+% knitr options
+<<setup, include=FALSE, cache=FALSE>>=
+# set global chunk options
+opts_chunk$set(fig.path='fig-', fig.align='center', fig.show='hold', fig.width=7, fig.height=7, out.width='.8\\linewidth')
+options(width=90)
+@
+
+
+\begin{document}
+
+%\begin{titlepage}
+\begin{center}
+
+% Actual title
+{ \bfseries Reviewing: Analysis of Website Visits Data}\\%[0.3cm]
+\textsc{Advanced Methods III 140.753}\\
+\normalsize
+\end{center}
+% \end{titlepage}
+
+%%%%%%%%%% Write document %%%%%%%%%%%%%%
+\section{Summary}
+The author analyzed the visits data to two websites ---Tumblr and Wordpress--- separately and also jointly. The goals were to calculate the expected fraction of visitors the websites retain from each spike and to identify any factors that influence this fraction. To do so, the author first analyzed three different peak finder methods: (1) top 5\% of all visits data, (2) greater than the mean plus 2 standard error, or (3) inclusion in the largest group from a k-means clustering. After an exploratory data analysis the author decided to use only the first two methods. 
+To attack the goals, the author then used three regression models: 
+\begin{enumerate}
+	\item linear piecewise spline regression on the date given the visits. This model is used to give a final justification of the peak finding method.
+	\item linear regression model on the number of visits at a spike given the difference in mean values from before and after the spike using non-spike values. The author claims that the coefficients give the fraction of interest.
+	\item linear regression model on the same difference in mean values as in the previous model given the fraction of interest.
+\end{enumerate}
+
+The author finds that when using the first peak finding method and all the data in their second model, the fraction retained by the websites after a spike is 8.1\% with a 90\% CI of [-5\%, 22.5\%]. In addition, Tumblr performed better than Wordpress with estimates of 4.3\% and 1.7\% respectively. Finally, using the third model there is a positive correlation between the difference in the mean values and the retained fraction of visitors although the estimates are close to 0. Thus, the larger the difference in means, the larger the fraction of visitors retained.
+
+\section{Major revisions}
+
+\begin{itemize}
+	\item The exploratory data analysis part uses plots to justify which peak finding method to use. However, no plot is included. If a plot is part of the story, as in this case, then it should be included in the report.
+	\item The results from table 1 and the text are incongruent. How come the 90\% for Tumblr is [0.5\%, 0.8\%] but it doesn't include the estimate of 4.3\%? Furthermore, why are the estimates for Tumblr and Wordpress lower (4.3\% and 1.7\%) than when using all the data (8.1\%)? Could it be that the Wordpress data used is the one for all time under study instead of when SimplyStatistics moved to Wordpress?
+	\item The description of the third statistical model is not clear in specifying how the fraction of visitors retained is calculated. Is it from the second model? If so, doesn't the second model give two coefficients? Or is the second model used for each spike individually (in this case, can you justify using linear regression)? This confusion can be solved by explained more explicitly the models.
+\end{itemize}
+
+
+
+
+\section{Minor revisions}
+
+
+\begin{itemize}
+	\item There is no mention of which websites are being analyzed. It could be the whole of Tumblr and Wordpress or some specific blogs. The reader would not know that it's SimplyStatistics.org.
+	\item Tables do not have numbers (table 1, table 2, etc) nor captions.
+	\item Reproducibility can be improved. Sure, the code has some comments, but there is no need to have a single 855 line long file. Specially when reloading of the data is needed. For example, the code could be split in three files: one for each peak finding method. Then, code that is used more than once can be turned into functions and saved into a functions.R file that is sourced in the other three. Furthermore, some of the variable names are not descriptive enough. For instance: \emph{aggregate} and \emph{aggregate2}. Plus there are no comments describing what they are.
+	\item Is the report itself reproducible? If not, maybe doing so can avoid issues such as the incongruence between table 1 and the confidence intervals.
+\end{itemize}
+
+% For references, uncomment and remember to use the following series
+% when compling the pdf:
+% R Sweave, pdflatex, bibtex, pdflatex, pdflatex, open pdf
+% \bibliographystyle{plain}
+% \bibliography{biblio}
+
+% Uncomment if you want to add the R session information
+%\tiny
+%<<info, results='asis', echo = FALSE>>=
+%toLatex(sessionInfo())
+%@
+
+
+\end{document}
