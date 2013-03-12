@@ -1,11 +1,19 @@
 In class boostrap exercise
 ==========================
 
+```{r setup, echo=FALSE}
+opts_chunk$set(cache=TRUE)
+```
+
+
 Instructions [here](https://docs.google.com/document/d/1mwYOkzZTKgPI-gpoI6UjIVl3mJEglQ1XhULoCst4u_o/edit).
 
 ```{r}
-## Load data
+## Load libraries
 library(bootstrap)
+library(boot)
+
+## Load data
 data(stamp)
 stamp  <- stamp[[1]]
 ```
@@ -48,5 +56,73 @@ localMaxima <- function(x) {
   }
   y
 }
+
+## Number of modes
+length(localMaxima(x$y))
+
+## X-coord of the modes
 x$x[localMaxima(x$y)]
 ```
+
+# Point 9: write function
+
+One way to bootstrap. Use the original bandwidth from the SJ method, bootstrap the data and using localMaxima find how many modes there are. Lets do that.
+
+```{r}
+
+## Re-sample data
+B <- 1000
+set.seed(20130312)
+data <- sapply(1:B, function(x) sample(stamp, replace=TRUE) )
+
+## Set bw
+bw <- density(stamp, bw = "SJ")$bw
+
+## Find modes function
+nModes <- function(x, bw) {
+	d <- density(x, bw=bw)
+	length(localMaxima(d$y))
+}
+
+## Find the modes
+modes <- apply(data, 2, nModes, bw=bw)
+```
+
+Doing it with the boot package
+
+```{r}
+nModes.boot <- function(x, i) {
+	d <- density(x[i], bw=bw)
+	length(localMaxima(d$y))
+}
+set.seed(201303122)
+modes.boot <- boot(stamp, nModes.boot, 1000)
+boot.ci(modes.boot)
+```
+
+
+# Point 10: CI
+
+```{r}
+## Explore the result
+hist(modes)
+
+## Confidence interval: non-parametric
+quantile(modes, c(0.025, 0.975))
+
+## Using boot pkg
+boot.ci(modes.boot)
+```
+
+# Point 11: smallest bw with 1 mode
+
+```{r}
+bws <- seq(0.00001, 0.03, by = 0.00001)
+one <- sapply(bws, function(x) { nModes(stamp, x) })
+
+## Find smallest bw
+h <- bws[which(one == 1)[1]]
+h
+```
+
+
