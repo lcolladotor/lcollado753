@@ -1,3 +1,10 @@
 *.txt
 *.pdf
+CollectionFrequencies.csv
+SampleDurationCodes.csv
+StateCountyCodes.csv
+Units.csv
+pre-small.Rdata
+raw-ref.Rdata
+
 
