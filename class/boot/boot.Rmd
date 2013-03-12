@@ -75,29 +75,29 @@ B <- 1000
 set.seed(20130312)
 data <- sapply(1:B, function(x) sample(stamp, replace=TRUE) )
 
-## Set bw
+## Original bw
 bw <- density(stamp, bw = "SJ")$bw
+bw
 
 ## Find modes function
-nModes <- function(x, bw) {
+nModes <- function(x, bw="SJ") {
 	d <- density(x, bw=bw)
 	length(localMaxima(d$y))
 }
 
 ## Find the modes
-modes <- apply(data, 2, nModes, bw=bw)
+modes <- apply(data, 2, nModes)
 ```
 
 Doing it with the boot package
 
 ```{r}
 nModes.boot <- function(x, i) {
-	d <- density(x[i], bw=bw)
+	d <- density(x[i], bw="SJ")
 	length(localMaxima(d$y))
 }
-set.seed(201303122)
+set.seed(20130312)
 modes.boot <- boot(stamp, nModes.boot, 1000)
-boot.ci(modes.boot)
 ```
 
 

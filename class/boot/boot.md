@@ -129,17 +129,25 @@ B <- 1000
 set.seed(20130312)
 data <- sapply(1:B, function(x) sample(stamp, replace = TRUE))
 
-## Set bw
+## Original bw
 bw <- density(stamp, bw = "SJ")$bw
+bw
+```
+
+```
+## [1] 0.001205
+```
+
+```r
 
 ## Find modes function
-nModes <- function(x, bw) {
+nModes <- function(x, bw = "SJ") {
     d <- density(x, bw = bw)
     length(localMaxima(d$y))
 }
 
 ## Find the modes
-modes <- apply(data, 2, nModes, bw = bw)
+modes <- apply(data, 2, nModes)
 ```
 
 
@@ -148,38 +156,11 @@ Doing it with the boot package
 
 ```r
 nModes.boot <- function(x, i) {
-    d <- density(x[i], bw = bw)
+    d <- density(x[i], bw = "SJ")
     length(localMaxima(d$y))
 }
-set.seed(201303122)
+set.seed(20130312)
 modes.boot <- boot(stamp, nModes.boot, 1000)
-boot.ci(modes.boot)
-```
-
-```
-## Warning: bootstrap variances needed for studentized intervals
-```
-
-```
-## Warning: extreme order statistics used as endpoints
-```
-
-```
-## BOOTSTRAP CONFIDENCE INTERVAL CALCULATIONS
-## Based on 1000 bootstrap replicates
-## 
-## CALL : 
-## boot.ci(boot.out = modes.boot)
-## 
-## Intervals : 
-## Level      Normal              Basic         
-## 95%   ( 5.963, 10.529 )   ( 6.000, 10.000 )  
-## 
-## Level     Percentile            BCa          
-## 95%   ( 8, 12 )   ( 7, 10 )  
-## Calculations and Intervals on Original Scale
-## Warning : BCa Intervals used Extreme Quantiles
-## Some BCa intervals may be unstable
 ```
 
 
@@ -202,7 +183,7 @@ quantile(modes, c(0.025, 0.975))
 
 ```
 ##  2.5% 97.5% 
-##     8    12
+##     8    13
 ```
 
 ```r
@@ -228,10 +209,10 @@ boot.ci(modes.boot)
 ## 
 ## Intervals : 
 ## Level      Normal              Basic         
-## 95%   ( 5.963, 10.529 )   ( 6.000, 10.000 )  
+## 95%   ( 5.313, 10.611 )   ( 5.000, 10.000 )  
 ## 
 ## Level     Percentile            BCa          
-## 95%   ( 8, 12 )   ( 7, 10 )  
+## 95%   ( 8, 13 )   ( 7, 10 )  
 ## Calculations and Intervals on Original Scale
 ## Warning : BCa Intervals used Extreme Quantiles
 ## Some BCa intervals may be unstable
