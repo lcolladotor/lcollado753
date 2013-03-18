@@ -1,0 +1,25 @@
+```{r}
+## Download data compiled by Brian Burke
+## The links are listed at http://www.advancednflstats.com/2010/04/play-by-play-data.html
+
+## Specify the links
+links <- c("https://docs.google.com/file/d/0BxEXxf9odCnMNGQzY2YyNmUtMTlhYy00YmQyLTg3ZTUtMGI2NDhjNGU4Zjg5/edit?hl=en#", "https://docs.google.com/file/d/0BxEXxf9odCnMODljMmIxNzItNzJjNy00ODJiLWJiNDItMDBlZGMwMjkwOTlk/edit?hl=en#", "https://docs.google.com/file/d/0BxEXxf9odCnMMGUyNjVkMWEtOWE2YS00YzI3LWJjYjEtZWU2MTIyNmJhOTk0/edit?hl=en#", "https://docs.google.com/file/d/0BxEXxf9odCnMYmIyMTdjNWItMjhiNS00NjJkLWIyYWEtZmI1ZGM4NmFmZGQy/edit?hl=en#", "https://docs.google.com/file/d/0BxEXxf9odCnMN2YxNGM0MzUtYTc2Mi00YjVjLWI3N2EtMzIwMDA0Y2E5OTg1/edit?hl=en#", "https://docs.google.com/file/d/0BxEXxf9odCnMYWZkOWU1YTItYTUzNS00MmM4LTk1MTktYmI3Y2E1Zjc3OTIy/edit?hl=en#", "https://docs.google.com/file/d/0BxEXxf9odCnMZDJmYzIzNWQtNjIyNS00NzQzLWJiMTEtYWI5M2U0MTI4Njlk/edit?hl=en#", "https://docs.google.com/file/d/0BxEXxf9odCnMMDAyOGRhMjYtMzlkMC00NGQwLTgxMWUtOWNmYWMxY2Q2ODY3/edit?num=50&sort=name&layout=list#", "https://docs.google.com/file/d/0BxEXxf9odCnMMWRkMDc0MDgtZDZhMi00ZGRlLTlkYjEtOTNkZjViZDI0ZGY2/edit?sort=name&layout=list&pid=0BxEXxf9odCnMZTdjMTVmMmItZjY5OS00NjQwLTg4ODYtNGFhZjFiMzhiZmQ2&cindex=8#", "https://docs.google.com/file/d/0BxEXxf9odCnMbmZvYzE3cjBzblE/edit", "https://docs.google.com/file/d/0BxEXxf9odCnMOGdHRUVvOV9GVVk/edit")
+
+names(links) <- 2002:2012
+
+## Open them
+sapply(links, browseURL)
+
+## Since they are Google documents, I added them to my google drive
+dateDownloaded <- date()
+dateDownloaded
+
+## Save the data path
+dataDir <- "/Users/lcollado/Google Drive/NFL"
+dir(dataDir)
+
+## Save the data location for later use
+save(dateDownloaded, dataDir, file="data-info.Rdata")
+```
+
+

@@ -11,7 +11,7 @@
 \usepackage{fancyhdr}
 \usepackage{manfnt}
 \usepackage{pgf}
-\usepackage{amsmath,amsthm,amssymb,natbib,graphicx}
+\usepackage{amsmath,amsthm,amssymb,graphicx}
 \usepackage{amsfonts}
 \DeclareMathAlphabet{\mathpzc}{OT1}{pzc}{m}{it}
 \usepackage{bbm}
@@ -20,9 +20,9 @@
 \usepackage{hyperref,graphicx}
 
 % Bibliography
-%\usepackage[style=numeric,firstinits=true]{biblatex}
+\usepackage[style=numeric,firstinits=true]{biblatex}
 % Specify bib files
-%\addbibresource{biblio.bib}
+\addbibresource{nflhalf.bib}
 
 % Color
 \usepackage{color}
@@ -78,19 +78,20 @@ options(width=90)
 \begin{center}
 
 % Actual title
-{ \bfseries Title}\\%[0.3cm]
+{ \bfseries Final project: NFL by half}\\%[0.3cm]
 \textsc{Advanced Methods III 140.753}\\
 \normalsize
 \end{center}
 % \end{titlepage}
 
 %%%%%%%%%% Write document %%%%%%%%%%%%%%
+hola \cite{playdata}
 
 
 % For references, uncomment and remember to use the following series
 % when compling the pdf:
 % R Sweave, pdflatex, bibtex, pdflatex, pdflatex, open pdf
-% \printbibliography
+\printbibliography
 
 % Uncomment if you want to add the R session information
 %\tiny
