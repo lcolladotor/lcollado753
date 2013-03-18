@@ -3,7 +3,7 @@ Order of scripts
 
 # Data acquisition
 
-1. data/download/downloadData.Rmd
+1. data/download/downloadData.Rmd [View html file](http://htmlpreview.github.com/?https://github.com/lcolladotor/lcollado753/blob/master/final/nfl_half/data/download/downloadData.html)
 
 # Data pre-processing
 
