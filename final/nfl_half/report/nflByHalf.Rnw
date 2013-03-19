@@ -266,6 +266,10 @@ The accuracy of the model is acceptable, although finer tuning might help and a 
 % when compling the pdf:
 % R Sweave, pdflatex, bibtex, pdflatex, pdflatex, open pdf
 
+\section{Acknowledgements}
+
+Used John Muchelli's Shiny\_Model at \url{https://github.com/muschellij2/Shiny_model} to get a quick idea on how to use Shiny.
+
 \section{Reproducibility}
 
 The code, data, and report is available at GitHub. Specifically here: \url{https://github.com/lcolladotor/lcollado753/tree/master/final/nfl_half}. The README file explains the order of the scripts.
