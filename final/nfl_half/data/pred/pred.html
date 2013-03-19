@@ -4,7 +4,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 
-<title>Getting a prediction model for 2012</title>
+<title>Generate data for 2012 season to use in preds</title>
 
 <style type="text/css">
 body, td {
@@ -179,23 +179,107 @@ hljs.initHighlightingOnLoad();
 </head>
 
 <body>
-<h1>Getting a prediction model for 2012</h1>
+<h1>Generate data for 2012 season to use in preds</h1>
 
-<pre><code class="r">## Load data
-load(&quot;../../data/process/first.Rdata&quot;)
-load(&quot;../../data/process/second.Rdata&quot;)
-load(&quot;../../data/process/full.Rdata&quot;)
-load(&quot;../../data/process/gameFirst.Rdata&quot;)
-load(&quot;../../data/process/gameFull.Rdata&quot;)
+<pre><code class="r">## Load data and functions
+load(&quot;../process/data.Rdata&quot;)
+source(&quot;../process/processingFunctions.R&quot;)
+</code></pre>
 
-## Fix names
-names(gameFirst) &lt;- names(first)
-names(gameFull) &lt;- names(full)
+<pre><code class="r">
+playdf &lt;- data[[&quot;2012&quot;]]
+playdf &lt;- subset(playdf, gameid != &quot;&quot;)
 
-## Specify data to use when to train the model
-gameFi2011 &lt;- do.call(rbind, gameFirst[as.character(2006:2011)])
+gameids &lt;- unique(playdf$gameid)
+teams &lt;- strsplit(gsub(&quot;[0-9]+_&quot;, &quot;&quot;, gameids), &quot;@&quot;)
 
-## Load libraries
+res &lt;- lapply(1:length(gameids), function(i) {
+    if (teams[[i]][1] %in% c(&quot;NFC&quot;, &quot;AFC&quot;)) {
+        ## Remove pro-bowl
+        result &lt;- NULL
+    } else {
+        ## Find team stats in that game
+        curgame &lt;- subset(playdf, gameid %in% gameids[i])
+
+        curstats &lt;- lapply(teams[[i]], function(team) {
+
+            if (FALSE) {
+                ## testing
+                i &lt;- 2
+                team &lt;- teams[[i]][1]
+                df &lt;- curgame
+                half &lt;- &quot;first&quot;
+            }
+
+            getTeamStats(team, curgame, half = &quot;first&quot;)
+
+
+        })
+        curstats &lt;- do.call(rbind, curstats)
+
+        res1 &lt;- gameConstruct(teamA = teams[[i]][1], teamB = teams[[i]][2], 
+            teamdf = curstats, playdf = playdf, id = gameids[i], is.local = FALSE)
+        res2 &lt;- gameConstruct(teamA = teams[[i]][2], teamB = teams[[i]][1], 
+            teamdf = curstats, playdf = playdf, id = gameids[i], is.local = TRUE)
+        result &lt;- rbind(res1, res2)
+    }
+    return(result)
+})
+res &lt;- do.call(rbind, res)
+rownames(res) &lt;- 1:nrow(res)
+
+## Find game number (no longer week because some teams get to the SB
+## through the wildcard round and others don&#39;t)
+gameA &lt;- sapply(1:nrow(res), function(i) {
+    if (i == 1) {
+        week &lt;- 1
+    } else {
+        week &lt;- sum(res$teamA[1:i] == res$teamA[i])
+    }
+    return(week)
+})
+
+gameB &lt;- sapply(1:nrow(res), function(i) {
+    if (i == 1) {
+        week &lt;- 1
+    } else {
+        week &lt;- sum(res$teamB[1:i] == res$teamB[i])
+    }
+    return(week)
+})
+
+## Find game day winning record
+gwrA &lt;- sapply(1:nrow(res), function(i) {
+    if (gameA[i] == 1) {
+        gwr &lt;- 0
+    } else {
+        gwr &lt;- sum(res$win[which(res$teamA[1:(i - 1)] == res$teamA[i])])/(gameA[i] - 
+            1)
+    }
+    return(gwr)
+})
+
+gwrB &lt;- sapply(1:nrow(res), function(i) {
+    if (gameB[i] == 1) {
+        gwr &lt;- 0
+    } else {
+        gwr &lt;- sum(res$win[which(res$teamA[1:(i - 2)] == res$teamB[i])])/(gameB[i] - 
+            1)
+    }
+    return(gwr)
+})
+
+## Add results
+res$gameA &lt;- gameA
+res$gwrA &lt;- gwrA
+res$gameB &lt;- gameB
+res$gwrB &lt;- gwrB
+
+## Rename
+info2012 &lt;- res
+
+## save
+save(info2012, file = &quot;info2012.Rdata&quot;, compress = &quot;gzip&quot;)
 </code></pre>
 
 </body>

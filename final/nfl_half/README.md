@@ -8,6 +8,7 @@ Order of scripts
 # Data pre-processing
 
 1. data/process/summarizeData.html [View html file](http://htmlpreview.github.com/?https://github.com/lcolladotor/lcollado753/blob/master/final/nfl_half/data/process/summarizeData.html)
+1. data/pred/pred.html [View html file](http://htmlpreview.github.com/?https://github.com/lcolladotor/lcollado753/blob/master/final/nfl_half/data/pred/pred.html)
 
 # EDA
 

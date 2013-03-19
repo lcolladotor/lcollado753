@@ -1,0 +1,113 @@
+Generate data for 2012 season to use in preds
+=============================================
+
+
+
+
+
+```r
+## Load data and functions
+load("../process/data.Rdata")
+source("../process/processingFunctions.R")
+```
+
+
+
+
+```r
+
+playdf <- data[["2012"]]
+playdf <- subset(playdf, gameid != "")
+
+gameids <- unique(playdf$gameid)
+teams <- strsplit(gsub("[0-9]+_", "", gameids), "@")
+
+res <- lapply(1:length(gameids), function(i) {
+    if (teams[[i]][1] %in% c("NFC", "AFC")) {
+        ## Remove pro-bowl
+        result <- NULL
+    } else {
+        ## Find team stats in that game
+        curgame <- subset(playdf, gameid %in% gameids[i])
+        
+        curstats <- lapply(teams[[i]], function(team) {
+            
+            if (FALSE) {
+                ## testing
+                i <- 2
+                team <- teams[[i]][1]
+                df <- curgame
+                half <- "first"
+            }
+            
+            getTeamStats(team, curgame, half = "first")
+            
+            
+        })
+        curstats <- do.call(rbind, curstats)
+        
+        res1 <- gameConstruct(teamA = teams[[i]][1], teamB = teams[[i]][2], 
+            teamdf = curstats, playdf = playdf, id = gameids[i], is.local = FALSE)
+        res2 <- gameConstruct(teamA = teams[[i]][2], teamB = teams[[i]][1], 
+            teamdf = curstats, playdf = playdf, id = gameids[i], is.local = TRUE)
+        result <- rbind(res1, res2)
+    }
+    return(result)
+})
+res <- do.call(rbind, res)
+rownames(res) <- 1:nrow(res)
+
+## Find game number (no longer week because some teams get to the SB
+## through the wildcard round and others don't)
+gameA <- sapply(1:nrow(res), function(i) {
+    if (i == 1) {
+        week <- 1
+    } else {
+        week <- sum(res$teamA[1:i] == res$teamA[i])
+    }
+    return(week)
+})
+
+gameB <- sapply(1:nrow(res), function(i) {
+    if (i == 1) {
+        week <- 1
+    } else {
+        week <- sum(res$teamB[1:i] == res$teamB[i])
+    }
+    return(week)
+})
+
+## Find game day winning record
+gwrA <- sapply(1:nrow(res), function(i) {
+    if (gameA[i] == 1) {
+        gwr <- 0
+    } else {
+        gwr <- sum(res$win[which(res$teamA[1:(i - 1)] == res$teamA[i])])/(gameA[i] - 
+            1)
+    }
+    return(gwr)
+})
+
+gwrB <- sapply(1:nrow(res), function(i) {
+    if (gameB[i] == 1) {
+        gwr <- 0
+    } else {
+        gwr <- sum(res$win[which(res$teamA[1:(i - 2)] == res$teamB[i])])/(gameB[i] - 
+            1)
+    }
+    return(gwr)
+})
+
+## Add results
+res$gameA <- gameA
+res$gwrA <- gwrA
+res$gameB <- gameB
+res$gwrB <- gwrB
+
+## Rename
+info2012 <- res
+
+## save
+save(info2012, file = "info2012.Rdata", compress = "gzip")
+```
+

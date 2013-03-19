@@ -1,17 +1,18 @@
 Getting a prediction model for 2012
 ===================================
 
-```{r setup, echo=FALSE}
+```{r options, echo=FALSE}
 opts_chunk$set(cache=TRUE)
 ```
 
-```{r loadData}
+```{r setup}
 ## Load data
 load("../../data/process/first.Rdata")
 load("../../data/process/second.Rdata")
 load("../../data/process/full.Rdata")
 load("../../data/process/gameFirst.Rdata")
 load("../../data/process/gameFull.Rdata")
+load("../../data/pred/info2012.Rdata")
 
 ## Fix names
 names(gameFirst) <- names(first)
@@ -20,5 +21,133 @@ names(gameFull) <- names(full)
 ## Specify data to use when to train the model
 gameFi2011 <- do.call(rbind, gameFirst[as.character(2006:2011)])
 
+## Transform to factors so glm() won't complain
+gameFi2011$teamA <- as.factor(gameFi2011$teamA)
+gameFi2011$teamB <- as.factor(gameFi2011$teamB)
+
+info2012$teamA <- as.factor(info2012$teamA)
+info2012$teamB <- as.factor(info2012$teamB)
+
 ## Load libraries
 ```
+
+```{r train, dependson="setup"}
+
+## Fit with all the variables
+fit <- glm(win ~ . - teamA -teamB, family=binomial, data=gameFi2011)
+
+## Explore the results
+summary(fit)
+
+## do the single term deletions
+drop1(fit, test="Chi")
+```
+
+```{r step, dependson=c("setup", "train")}
+## What is the model when using step-wise selection?
+fitStep <- step(fit, trace=0)
+summary(fitStep)
+```
+
+Lets see how the predictions for 2012 using the first half data of those games and the model selected through step.
+
+```{r pred, dependson=c("setup", "step")}
+
+pResp <- predict(fitStep, newdata=info2012, se=TRUE, type="response")
+plot(pResp$fit, pResp$se)
+
+plot(pResp$fit, gameFirst[["2012"]]$win)
+
+p <- seq(0, 1, by=0.001)
+idx <- rep(c(TRUE, FALSE), nrow(gameFirst[["2012"]])/2)
+
+acc <- sapply(p, function(x) { 
+	i <- which(pResp$fit <= x)
+	sum(gameFirst[["2012"]]$win[i]) / length(i)
+})
+
+acc[is.nan(acc) | acc == Inf] <- 0
+plot(p, acc)
+abline(a=0, b=1, col="red")
+
+```
+
+```{r brianWay, dependson=c("setup", "step", "pred")}
+
+ilogit <- function(x) { exp(x)/(1+exp(x))}
+paired <- sapply(which(idx), function(i) {
+	logitA <- predict(fitStep, newdata=gameFirst[["2012"]][i, ])
+	logitB <- predict(fitStep, newdata=gameFirst[["2012"]][i+1, ])
+	p1 <- ilogit(logitA - logitB)
+	return(c(p1, 1-p1))
+})
+paired <- as.vector(paired)
+
+acc2 <- sapply(p, function(x) { 
+	i <- which(paired <= x)
+	sum(gameFirst[["2012"]]$win[i]) / length(i)
+})
+acc2[is.nan(acc2) | acc2 == Inf] <- 0
+plot(p, acc2)
+abline(a=0, b=1, col="red")
+
+## Repeat with full model
+paired2 <- sapply(which(idx), function(i) {
+	logitA <- predict(fit, newdata=gameFirst[["2012"]][i, ])
+	logitB <- predict(fit, newdata=gameFirst[["2012"]][i+1, ])
+	p1 <- ilogit(logitA - logitB)
+	return(c(p1, 1-p1))
+})
+paired2 <- as.vector(paired2)
+
+acc3 <- sapply(p, function(x) { 
+	i <- which(paired2 <= x)
+	sum(gameFirst[["2012"]]$win[i]) / length(i)
+})
+acc3[is.nan(acc3) | acc3 == Inf] <- 0
+plot(p, acc3)
+abline(a=0, b=1, col="red")
+```
+
+```{r compareAcc, dependson=c("setup", "step", "pred", "brainWay")}
+plot(p, acc, ylim=range(c(acc, acc2, acc3)), type="l", lwd=2)
+lines(p, acc2, col="blue", lwd=2)
+lines(p, acc3, col="orange", lwd=2)
+abline(a=0, b=1, col="red")
+```
+
+
+```{r BBurke, dependson=c("setup", "step")}
+
+function <- (f, newdata) {
+	
+	if(FALSE){
+		## Testing
+		f <- fitStep
+		newdata <- gameFirst[["2012"]]
+	}
+	
+	idx <- rep(c(TRUE, FALSE), nrow(newdata)/2)
+	cnames <- colnames(newdata)
+	cnames <- cnames[!cnames %in% c("teamA", "teamB", "win", "local", "resumes", "date")]
+	
+	toavg <- newdata[, cnames]
+	leagueavg <- colMeans(toavg)
+	leaguedf <- data.frame(matrix(leagueavg, nrow=1))
+	colnames(leaguedf) <- names(leagueavg)
+	leaguedf$local <- FALSE
+	leaguedf$resumes <- FALSE
+	logitAvg <- predict(f, newdata=leaguedf)
+	
+	sapply(which(idx), function(i))  {
+		logitA <- predict(f, newdata=gameFirst[["2012"]][i, ])
+		logitB <- predict(f, newdata=gameFirst[["2012"]][i+1, ])
+		p1 <- ilogit(logitA - logitB)
+		return(c(p1, 1-p1))
+	}
+}
+
+
+```
+
+
