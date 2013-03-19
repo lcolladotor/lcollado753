@@ -85,6 +85,18 @@ options(width=90)
 % \end{titlepage}
 
 %%%%%%%%%% Write document %%%%%%%%%%%%%%
+\section{Introduction}
+
+\section{Pre-processing}
+
+\section{Exploratory Data Analysis}
+\subsection{Training model}
+
+\section{Results}
+
+\section{Deployment on the web}
+Shiny!
+
 hola \cite{playdata}
 
 
