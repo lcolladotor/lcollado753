@@ -56,14 +56,14 @@ Lets see how the predictions for 2012 using the first half data of those games a
 pResp <- predict(fitStep, newdata=info2012, se=TRUE, type="response")
 plot(pResp$fit, pResp$se)
 
-plot(pResp$fit, gameFirst[["2012"]]$win)
+plot(pResp$fit, info2012$win)
 
 p <- seq(0, 1, by=0.001)
-idx <- rep(c(TRUE, FALSE), nrow(gameFirst[["2012"]])/2)
+idx <- rep(c(TRUE, FALSE), nrow(info2012)/2)
 
 acc <- sapply(p, function(x) { 
 	i <- which(pResp$fit <= x)
-	sum(gameFirst[["2012"]]$win[i]) / length(i)
+	sum(info2012$win[i]) / length(i)
 })
 
 acc[is.nan(acc) | acc == Inf] <- 0
@@ -74,10 +74,11 @@ abline(a=0, b=1, col="red")
 
 ```{r brianWay, dependson=c("setup", "step", "pred")}
 
+idx <- rep(c(TRUE, FALSE), nrow(info2012)/2)
 ilogit <- function(x) { exp(x)/(1+exp(x))}
 paired <- sapply(which(idx), function(i) {
-	logitA <- predict(fitStep, newdata=gameFirst[["2012"]][i, ])
-	logitB <- predict(fitStep, newdata=gameFirst[["2012"]][i+1, ])
+	logitA <- predict(fitStep, newdata=info2012[i, ])
+	logitB <- predict(fitStep, newdata=info2012[i+1, ])
 	p1 <- ilogit(logitA - logitB)
 	return(c(p1, 1-p1))
 })
@@ -85,7 +86,7 @@ paired <- as.vector(paired)
 
 acc2 <- sapply(p, function(x) { 
 	i <- which(paired <= x)
-	sum(gameFirst[["2012"]]$win[i]) / length(i)
+	sum(info2012$win[i]) / length(i)
 })
 acc2[is.nan(acc2) | acc2 == Inf] <- 0
 plot(p, acc2)
@@ -93,8 +94,8 @@ abline(a=0, b=1, col="red")
 
 ## Repeat with full model
 paired2 <- sapply(which(idx), function(i) {
-	logitA <- predict(fit, newdata=gameFirst[["2012"]][i, ])
-	logitB <- predict(fit, newdata=gameFirst[["2012"]][i+1, ])
+	logitA <- predict(fit, newdata=info2012[i, ])
+	logitB <- predict(fit, newdata=info2012[i+1, ])
 	p1 <- ilogit(logitA - logitB)
 	return(c(p1, 1-p1))
 })
@@ -102,12 +103,14 @@ paired2 <- as.vector(paired2)
 
 acc3 <- sapply(p, function(x) { 
 	i <- which(paired2 <= x)
-	sum(gameFirst[["2012"]]$win[i]) / length(i)
+	sum(info2012$win[i]) / length(i)
 })
 acc3[is.nan(acc3) | acc3 == Inf] <- 0
 plot(p, acc3)
 abline(a=0, b=1, col="red")
 ```
+
+I think that I might be doing something wrong, let me trace back
 
 ```{r compareAcc, dependson=c("setup", "step", "pred", "brainWay")}
 plot(p, acc, ylim=range(c(acc, acc2, acc3)), type="l", lwd=2)
@@ -119,35 +122,44 @@ abline(a=0, b=1, col="red")
 
 ```{r BBurke, dependson=c("setup", "step")}
 
-function <- (f, newdata) {
-	
-	if(FALSE){
-		## Testing
-		f <- fitStep
-		newdata <- gameFirst[["2012"]]
-	}
-	
-	idx <- rep(c(TRUE, FALSE), nrow(newdata)/2)
-	cnames <- colnames(newdata)
-	cnames <- cnames[!cnames %in% c("teamA", "teamB", "win", "local", "resumes", "date")]
-	
-	toavg <- newdata[, cnames]
-	leagueavg <- colMeans(toavg)
-	leaguedf <- data.frame(matrix(leagueavg, nrow=1))
-	colnames(leaguedf) <- names(leagueavg)
-	leaguedf$local <- FALSE
-	leaguedf$resumes <- FALSE
-	logitAvg <- predict(f, newdata=leaguedf)
-	
-	sapply(which(idx), function(i))  {
-		logitA <- predict(f, newdata=gameFirst[["2012"]][i, ])
-		logitB <- predict(f, newdata=gameFirst[["2012"]][i+1, ])
-		p1 <- ilogit(logitA - logitB)
-		return(c(p1, 1-p1))
-	}
-}
+source("predFunctions.R")
+
+## well, this is actually the same as "paired" as shown a few lines below
+pStep <- getPred(fitStep, info2012)
+
+## Set number of bins
+bin <- 30
+
+## Yes, same as paired
+pStep.eval <- evalPred(pStep, bin, info2012)
+sum(evalPred(paired, bin, info2012, plot=FALSE)$real - pStep.eval$real)
+
+pResp.eval <- evalPred(pResp$fit, bin, info2012)
+plot(pStep.eval$centers, pStep.eval$real - pResp.eval$real)
+
+plot(pStep.eval$centers, pStep.eval$real, type="o", col="blue", ylim=c(0, 1))
+lines(pStep.eval$centers, pResp.eval$real, type="o", col="orange")
+abline(a=0, b=1, col="red")
+
+## Seems better to use regular predict() than to do the diffence in logits
+## However, in such a case the probabilities don't add to 1!!!
+
+hist(pResp$fit[idx] + pResp$fit[!idx])
+table(pStep[idx] + pStep[!idx])
 
 
+## What if I don't use the paired info?
+check <- pStep[idx]
+check.eval <- evalPred(check, bin, info2012[idx,])
+
+plot(pStep.eval$centers, pStep.eval$real, type="o", col="blue", ylim=c(0, 1))
+lines(pStep.eval$centers, check.eval$real, type="o", col="orange")
+abline(a=0, b=1, col="red")
+## Plot looks more jumpy, should be because of less data
 ```
+
+
+Ok, now it looks like I got this right.
+
 
 
