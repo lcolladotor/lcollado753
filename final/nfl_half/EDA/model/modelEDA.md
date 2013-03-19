@@ -443,7 +443,7 @@ summary(f2013)
 
 ## Save the trained models
 fits <- list(`2012` = fitStep, `2013` = f2013)
-save(fits, file = "fits.Rdata")
+save(fits, file = "fits.Rdata", compress = "gzip")
 ```
 
 

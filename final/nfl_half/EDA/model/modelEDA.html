@@ -575,7 +575,7 @@ summary(f2013)
 <pre><code class="r">
 ## Save the trained models
 fits &lt;- list(`2012` = fitStep, `2013` = f2013)
-save(fits, file = &quot;fits.Rdata&quot;)
+save(fits, file = &quot;fits.Rdata&quot;, compress = &quot;gzip&quot;)
 </code></pre>
 
 </body>
