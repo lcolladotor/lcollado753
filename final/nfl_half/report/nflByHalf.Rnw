@@ -20,7 +20,7 @@
 \usepackage{hyperref,graphicx}
 
 % Bibliography
-\usepackage[style=numeric,firstinits=true]{biblatex}
+\usepackage[style=numeric-comp,firstinits=true]{biblatex}
 % Specify bib files
 \addbibresource{nflhalf.bib}
 
@@ -67,7 +67,7 @@
 % knitr options
 <<setup, include=FALSE, cache=FALSE>>=
 # set global chunk options
-opts_chunk$set(fig.path='fig-', fig.align='center', fig.show='hold', fig.width=7, fig.height=7, out.width='.8\\linewidth')
+opts_chunk$set(fig.path='fig-', fig.align='center', fig.show='hold', fig.width=7, fig.height=7, out.width='.8\\linewidth', echo=FALSE, message=FALSE, cache=FALSE)
 options(width=50)
 @
 
@@ -89,39 +89,178 @@ options(width=50)
 
 Have you ever wondered if you should keep watching a football game beyond half-time? You are probably having a busy weekend and need to do other things. Specially if the team that you like has a high probability of winning (or losing if they are doing terrible). 
 
-Analyzing NFL data and variables has been done before. For example, Carney and Fenn\cite{carney_determinants_2004} were interested in identifying variables that affect the Nielsen TV rating of the games. Some of the variables they looked at include the game day winning percentage of the two teams involved. In their analysis, one important variable was whether the local team had gone to the playoffs the previous year which makes sense for explaining the TV rating.
+Analyzing NFL data and variables has been done before. For example, Carney and Fenn \cite{carney_determinants_2004} were interested in identifying variables that affect the Nielsen TV rating of the games. Some of the variables they looked at include the game day winning percentage of the two teams involved and the season week. In their analysis, one important variable was whether the local team had gone to the playoffs the previous year which makes sense for explaining the TV rating.
 
-Brian Burke who describes himself as \emph{a former Navy pilot who has taken up the less dangerous hobby of N.F.L. statistical analysis, operates Advanced NFL Stats, a blog about football, math and human behavior}\cite{week4_2009} has published many blog posts where he analyzes NFL data. He has devised \emph{narrative statistics} such as a \emph{winning probability model} ---it's quite accurate\cite{wpaacc}--- which he uses to determine the effect specific plays have on the game\cite{wpa}. Another one that has similar uses is the \emph{expected points}\cite{epa} and \emph{expected points added}. By using the \emph{win probability model} he can estimate how exciting the game was\cite{excitement}. 
+Brian Burke who describes himself as \emph{a former Navy pilot who has taken up the less dangerous hobby of N.F.L. statistical analysis, operates Advanced NFL Stats, a blog about football, math and human behavior} \cite{week4_2009} has published many blog posts where he analyzes NFL data. He has devised \emph{narrative statistics} such as a \emph{winning probability model} ---it's quite accurate \cite{wpaacc}--- which he uses to determine the effect specific plays have on the game \cite{wpa}. Another one that has similar uses is the \emph{expected points} \cite{epa} and \emph{expected points added}. By using the \emph{win probability model} he can estimate how exciting the game was \cite{excitement}. 
 
-Of special interest, Brian Burke has used logistic regression in a rather exquisite way to predict the probability of winning for each team during the NFL season\cite{detail1, detail2, week4_2009, week4_2012}. 
+Of special interest, Brian Burke has used logistic regression in a rather exquisite way to predict the probability of winning for each team during the NFL season \cite{detail1, detail2, week4_2009, week4_2012}. 
 
-The goal of this small project is to use the play-by-play data for the first half of NFL games to predict which team will win. To do so a modification of Brian Burke's game probability model will be implemented. In addition, the resulting prediction model will be deployed on the web so it can be used for the 2013 season.
+The goal of this small project is to use the play-by-play data for the first half of NFL games to predict which team will win. To do so a modification of Brian Burke's game probability model \cite{detail1, detail2, week4_2009, week4_2012} will be implemented. In addition, part of the goal is to deploy the resulting prediction model on the web so it can be used for the 2013 season.
 
 
 \section{Pre-processing}
+Brian Burke has compiled NFL play-by-play data for the 2002 to 2012 seasons \cite{playdata}, which I simply downloaded. Processing it was quite another story as play descriptions can be convoluted. Once I sorted out the type of plays, I proceeded to calculate the following variables.
+
+For each season and each team, I got the following information similar to what Burke has described \cite{detail1}.
+\begin{enumerate}
+	\item[oPassYdsAtt] Net offensive passing yards per attempt. It's the sum of passing yards minus the sack yards, then divided by the number of passing plays (complete passes, interceptions, incomplete passes and sacks).
+	\item[oInt] Offensive interceptions per attempt. 
+	\item[oRun] Running success rate. The number of running plays in which the down-distance-togo improved divided by the number of running plays.
+	\item[oFumble] Offensive fumbles per attempt. The number of fumbles divided by the number of passing and running plays.
+	\item[pen] Penalty yards per play.
+	\item[dPassYdsAtt] Defensive net passing yards per attempt. Similar to \emph{oPassYdsAtt}.
+	\item[dRunAtt] Defensive running yards per attempt. Running yards allowed divided by the number of plays the opponent ran.
+	\item[dInt]	Defensive interceptions per attempt.
+\end{enumerate}
+
+For each season, I then built a data set for model training. It has two rows per game, one where team A is the local team and one where team A is the visiting team as inspired by Burke \cite{detail1}.
+
+\begin{itemize}
+	\item team A's season stats.
+	\item team B's season stats.
+	\item[local] Whether team A was the local team.
+	\item[win] Whether team A won the game.
+	\item[halfdiff] The half-time difference in score. A positive value means team A was winning.
+	\item[date] Date of the game.
+	\item[resumes] Whether team A has the first drive of the second half.
+	\item[gameA] Which game of the season is for team A?
+	\item[gwrA] Game winning percentage for team A in 0 to 1 scale. 0 is used for week 1.
+	\item[gameB] Same as \emph{gameA} but for team B.
+	\item[gwrB] Same as \emph{gwrA} but for team B.
+\end{itemize}
+
+The information can then be easily combined across different seasons.
+
+Finally, I built a data set for evaluating the model's prediction accuracy using the 2012 regular season data. This is similar to the one described above but instead of using team A's and team B's season stats, the stats are calculated per game.
+
 
 \section{Exploratory Data Analysis}
+
+\subsection{First vs second half}
+
+Exploring the differences between the team statistics per season between the first and second half did not reveal major discrepancies. Although some variables have interesting trends as shown in figure \ref{fig:diffyears} where the offensive net passing yards per attempt has become much less variable since 2006 while the inverse is true for the defensive interceptions per play.
+
+<<diffyears, fig.cap="Difference between the first and second half for the offensive net passing yards per attempt (left) and defensive interceptions per play (right). Each year has 32 observations (1 per team).", out.width='0.8\\linewidth', out.height='0.4\\linewidth', fig.width=8, fig.height=4>>=
+## Load data
+load("../data/process/first.Rdata")
+load("../data/process/second.Rdata")
+
+## Load libraries
+library(car)
+
+## Get differences by variable
+getDiffs <- function(var) {
+    res <- lapply(1:length(first), function(i) {
+        tmp <- first[[i]][, var] - second[[i]][, var]
+        data.frame(diff = tmp, year = rep(names(first)[i], length(tmp)))
+    })
+    res <- do.call(rbind, res)
+}
+vars <- colnames(first[[1]])[2:ncol(first[[1]])]
+allDiffs <- lapply(vars, getDiffs)
+names(allDiffs) <- vars
+par(mfrow=c(1, 2))
+set.seed(20130318)
+plot(allDiffs[["oPassYdsAtt"]]$year, allDiffs[["oPassYdsAtt"]]$diff, main = "oPassYdsAtt", ylab="1st minus 2nd half", xlab="Year")
+plot(allDiffs[["dInt"]]$year, allDiffs[["dInt"]]$diff, main = "dInt", ylab="1st minus 2nd half", xlab="Year")
+@
+
+
+After grouping the training data for the 2002 to 2011 seasons, it becomes evident that seasons from 2002 to 2005 are different from 2006 onward. This can be seen in figure \ref{fig:scatter} when comparing the date versus team A's offensive net passing yards for the first half. This pattern repeats itself with nearly all the variables in the training data set\footnote{Data not shown but is available at \url{https://github.com/lcolladotor/lcollado753/tree/master/final/nfl_half/EDA/initial}.}. Thus, when training the models only data from 2006 to 2011 will be used. However, note that there in figure \ref{fig:scatter} there is a very weak relation between date and win status.
+
+It is also important to note in figure \ref{fig:scatter} that the score at half-time is the most associated to the win status. 
+
+<<scatter, dependson="diffyears", fig.cap="Win status, date, score at half-time and team A's net offensive passing yards shown in a scatterplot matrix. The red lines are smooth lines whose purpose is to illustrate the relation between the variables. Diagonal entries show density plots along with ticks. Data is from the training data for 2002 to 2011 seasons.", warning=FALSE>>=
+
+## Group 2002 to 2011
+load("../data/process/gameFirst.Rdata")
+names(gameFirst) <- names(first)
+gameFi2011 <- do.call(rbind, gameFirst[as.character(2002:2011)])
+scatterplotMatrix(~win + date + halfdiff + teamAoPassYdsAtt, data = gameFi2011, 
+    reg.line = FALSE, spread = FALSE, main = "2002 to 2011")
+	
+@
+
 \subsection{Training model}
+
+Using logistic regression, a model with all the variables was trained using the data from 2006 to 2011. Single term deletions were explored\footnote{Data not shown but available at \url{https://github.com/lcolladotor/lcollado753/blob/master/final/nfl_half/EDA/model/}.} clearly show that the half-time score is the most important variable as was already explored previously. It is followed by the game day winning percentage for both teams (\emph{gwrA, gwrB}). 
+
+
+Using step-wise AIC selection, the obtained model is the one shown in table \ref{tab:glm}. In particular, this model is different from the one used by Brian Burke \cite{detail1, detail2} as it considers less team variables but adds the half-time score difference, the game day winning percentages and an indicator for who starts the second half. 
+
+<<glm, results='asis'>>=
+## Load data
+load("../EDA/model/fits.Rdata")
+
+## Load library
+library(xtable)
+
+## Generate summary
+print(xtable(summary(fits[[1]]), caption="Logistic regression for model trained with 2006 to 2011 data. This model was selected using step-wise AIC selection.", label="tab:glm", digits = -1), size="footnotesize")
+@
+
 
 \section{Results}
 
-\section{Deployment on the web}
-Shiny!\cite{shiny}
+For each game in the 2012 season, the model was used to get a predictor in the logit scale for both teams. Then, the difference of logits was inverted by the inverse logit to get the probability of winning for team A and team B similarly to what Burke does \cite{detail1}. In more detail, the model is used to get:
 
-<<eval=FALSE>>=
-## This is how you can run the Shiny app
+\begin{equation}
+	\eta_A = logit(pr(team_A wins)) = x_{teamA} \hat \beta , \quad  \eta_B = logit(pr(team_B wins)) = x_{teamB} \hat \beta  \label{eta}
+\end{equation}
+\begin{equation}
+	p_A = logit^{-1}( \eta_A - \eta_b),\quad p_B = 1 - p_A \label{pa}
+\end{equation}
+
+Note that $\eta_A - \eta_B$ is the log odds ratio of team A winning over team B. Thus the inverse logit gives the probability of team A winning. By calculating the probability of team A winning in this way, instead of just taking the inverse logit of the model prediction, we guarantee that the probability of team A winning plus the one for team B equals 1. Otherwise this is not guaranteed.
+
+Notably, this model is much simpler than the one used by Burke \cite{detail2} where he uses iterations of comparing a given team versus the league average to adjust for the strength of each time. The relative strength is simplified in this model by considering the game day winning percentage of both teams (\emph{gwrA, gwrB}).
+
+Figure \ref{fig:pred} (left) evaluates the performance of the model by using 30 bins. While the correspondence to the real winning percentages wiggles around the diagonal line, it is also important to consider that most of the predictions are closer to 0 and 1 as shown in \ref{fig:pred} (right). Thus, there is much less data in the middle of \ref{fig:pred} (left) and this can explain the extra variability seen. 
+
+<<pred, dependson=c("diffyears", "scatter"), fig.cap="Evaluation of the prediction results for all games in 2012 using model trained on data from years 2006 to 2011. (Left) Predictions are binned, and the actual percent of games won (0 to 1 scale) is calculated and shown in blue. Red line shows the 45 degree line. (Right) Histogram of predicted probabilities of winning using 30 breaks. (Both) Predictions for each team in a game are used.", out.width='0.8\\linewidth', out.height='0.4\\linewidth', fig.width=8, fig.height=4>>=
+## Load data
+load("../data/pred/info2012.Rdata")
+source("../EDA/model/predFunctions.R")
+
+## Fix factors
+info2012$teamA <- as.factor(info2012$teamA)
+info2012$teamB <- as.factor(info2012$teamB)
+
+## ilogit
+ilogit <- function(x) {
+    exp(x)/(1 + exp(x))
+}
+
+pred <- getPred(fits[[1]], info2012)
+fEval <- evalPred(pred, bin=30, info2012, plot=FALSE)
+par(mfrow=c(1, 2))
+plot(fEval$centers, fEval$real, type="o", col="blue", ylim=c(0, 1), xlab="Probability of winning (bin center)", ylab="Percent of games won (0-1 scale)")
+abline(a = 0, b = 1, col = "red")
+hist(pred, col="light blue", main="Histogram of predicted winning probabilities", xlab="Probability of winning", breaks=30)
+
+@
+
+\section{Deployment on the web}
+
+Having identified the variables to use for prediction, a second model was trained with the data from 2006 to 2012 in order to be able to use it when predicting 2013 games. Both the model for predicting 2012 and the model for predicting 2013 have been implemented in a web application using Shiny \cite{shiny}. The Shiny code is available at \url{https://github.com/lcolladotor/lcollado753/tree/master/final/nfl_half/shiny}. However, it is best to see it live which you can do using the following R commands:
+
+<<eval=FALSE, echo=TRUE>>=
+## This is how you can run the Shiny app from R
 library(shiny)
 runUrl("https://github.com/lcolladotor/lcollado753/archive/master.zip",
  subdir="final/nfl_half/shiny/")
 @
 
+The web application shows the prediction, the model information (similar to table \ref{tab:glm}), diagnostic plots, and lets you download the specified values for future use. Furthermore, it is set with mean values and has sliders with sensible limits. However, it currently requires the user to input the data for the prediction. Future improvements would include live-scrapping the NFL play-by-play data.
+
+
+
 
 \section{Conclusions}
 
+Notably the game changed at the start of the 2006 season. While this limits the available data for model training, it is certainly possible to build a predictive model using play-by-play data from the first half to predict which team will win at the end of the game. If you are someone who will watch a game depending on how certain it is that a given team will win the match, then you can use the model and the web application to help you make that decision. You make the final decision depending on a given cutoff of your choosing. Plus you might be willing to considering more certain games in certain specific situations.
 
-
-hola \cite{playdata}
-
+The accuracy of the model is acceptable, although finer tuning might help and a detailed comparison could be made versus alternative models \cite{detail1, detail2}. Furthermore, the web application is not yet fully user-friendly to use for predicting 2013 games as you need to either track the required data or estimate them from other sources such as the the television half-time summaries.
 
 % For references, uncomment and remember to use the following series
 % when compling the pdf:

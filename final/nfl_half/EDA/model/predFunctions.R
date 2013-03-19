@@ -48,8 +48,11 @@ evalPred <- function(pred, bin, truth, plot=TRUE) {
 	
 	intervalMean <- rowMeans(endpoints)
 	
-	plot(intervalMean, real)
-	abline(a=0, b=1, col="red")
+	if(plot) {
+		plot(intervalMean, real)
+		abline(a=0, b=1, col="red")
+	}
+	
 	
 	list(centers=intervalMean, real=real)
 }
