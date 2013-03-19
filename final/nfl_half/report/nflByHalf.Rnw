@@ -68,7 +68,7 @@
 <<setup, include=FALSE, cache=FALSE>>=
 # set global chunk options
 opts_chunk$set(fig.path='fig-', fig.align='center', fig.show='hold', fig.width=7, fig.height=7, out.width='.8\\linewidth')
-options(width=90)
+options(width=50)
 @
 
 
@@ -87,6 +87,17 @@ options(width=90)
 %%%%%%%%%% Write document %%%%%%%%%%%%%%
 \section{Introduction}
 
+Have you ever wondered if you should keep watching a football game beyond half-time? You are probably having a busy weekend and need to do other things. Specially if the team that you like has a high probability of winning (or losing if they are doing terrible). 
+
+Analyzing NFL data and variables has been done before. For example, Carney and Fenn\cite{carney_determinants_2004} were interested in identifying variables that affect the Nielsen TV rating of the games. Some of the variables they looked at include the game day winning percentage of the two teams involved. In their analysis, one important variable was whether the local team had gone to the playoffs the previous year which makes sense for explaining the TV rating.
+
+Brian Burke who describes himself as \emph{a former Navy pilot who has taken up the less dangerous hobby of N.F.L. statistical analysis, operates Advanced NFL Stats, a blog about football, math and human behavior}\cite{week4_2009} has published many blog posts where he analyzes NFL data. He has devised \emph{narrative statistics} such as a \emph{winning probability model} ---it's quite accurate\cite{wpaacc}--- which he uses to determine the effect specific plays have on the game\cite{wpa}. Another one that has similar uses is the \emph{expected points}\cite{epa} and \emph{expected points added}. By using the \emph{win probability model} he can estimate how exciting the game was\cite{excitement}. 
+
+Of special interest, Brian Burke has used logistic regression in a rather exquisite way to predict the probability of winning for each team during the NFL season\cite{detail1, detail2, week4_2009, week4_2012}. 
+
+The goal of this small project is to use the play-by-play data for the first half of NFL games to predict which team will win. To do so a modification of Brian Burke's game probability model will be implemented. In addition, the resulting prediction model will be deployed on the web so it can be used for the 2013 season.
+
+
 \section{Pre-processing}
 
 \section{Exploratory Data Analysis}
@@ -95,7 +106,19 @@ options(width=90)
 \section{Results}
 
 \section{Deployment on the web}
-Shiny!
+Shiny!\cite{shiny}
+
+<<eval=FALSE>>=
+## This is how you can run the Shiny app
+library(shiny)
+runUrl("https://github.com/lcolladotor/lcollado753/archive/master.zip",
+ subdir="final/nfl_half/shiny/")
+@
+
+
+\section{Conclusions}
+
+
 
 hola \cite{playdata}
 
@@ -103,13 +126,20 @@ hola \cite{playdata}
 % For references, uncomment and remember to use the following series
 % when compling the pdf:
 % R Sweave, pdflatex, bibtex, pdflatex, pdflatex, open pdf
-\printbibliography
+
+\section{Reproducibility}
+
+The code, data, and report is available at GitHub. Specifically here: \url{https://github.com/lcolladotor/lcollado753/tree/master/final/nfl_half}. The README file explains the order of the scripts.
+
+This report was generated using the following R packages.
 
 % Uncomment if you want to add the R session information
-%\tiny
-%<<info, results='asis', echo = FALSE>>=
-%toLatex(sessionInfo())
-%@
+\tiny
+<<info, results='asis', echo = FALSE>>=
+toLatex(sessionInfo())
+@
+
+\printbibliography
 
 
 \end{document}

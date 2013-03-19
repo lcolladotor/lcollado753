@@ -15,6 +15,10 @@ Order of scripts
 1. EDA/initial/initialEDA.html [View html file](http://htmlpreview.github.com/?https://github.com/lcolladotor/lcollado753/blob/master/final/nfl_half/EDA/initial/initialEDA.html)
 2. EDA/model/modelEDA.html [View html file](http://htmlpreview.github.com/?https://github.com/lcolladotor/lcollado753/blob/master/final/nfl_half/EDA/model/modelEDA.html)
 
+# Shiny
+
+1. shiny/ Run directly from GitHub or download the files to your computer.
+
 # Report
 
-1. report/nflByHalf.Rnw
+1. report/nflByHalf.Rnw generates report/nflByHalf.pdf
