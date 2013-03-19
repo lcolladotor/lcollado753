@@ -12,4 +12,113 @@ load("../../data/process/second.Rdata")
 load("../../data/process/full.Rdata")
 load("../../data/process/gameFirst.Rdata")
 load("../../data/process/gameFull.Rdata")
+
+## Fix names
+names(gameFirst) <- names(first)
+names(gameFull) <- names(full)
+
+## Load libraries
+library(car)
 ```
+
+```{r compareHalfs, dependson="setup"}
+## Quick look at 2002 data
+plot(first[[1]]$oPassYdsAtt, second[[1]]$oPassYdsAtt)
+abline(a=0, b=1, col="red")
+plot(first[[1]]$oPassYdsAtt, full[[1]]$oPassYdsAtt)
+abline(a=0, b=1, col="red")
+
+```
+
+```{r oPass, dependson="setup"}
+## Compare all first vs 2nd half for all years (oPassYdsAtt)
+oPass <- lapply(1:length(first), function(i) {
+	tmp <- first[[i]]$oPassYdsAtt  - second[[i]]$oPassYdsAtt
+	data.frame(diff = tmp, year=rep(names(first)[i], length(tmp)))
+})
+oPass <- do.call(rbind, oPass)
+plot(oPass$year, oPass$diff)
+set.seed(20130318)
+plot(jitter(as.integer(oPass$year)), oPass$diff)
+```
+
+```{r allDiffs, dependson="setup"}
+
+## Lets make the same plot for all the differences between 1st half - 2nd half
+getDiffs <- function(var) {
+	res <- lapply(1:length(first), function(i) {
+		tmp <- first[[i]][, var] - second[[i]][, var]
+		data.frame(diff = tmp, year=rep(names(first)[i], length(tmp)))
+	})
+	res <- do.call(rbind, res)
+}
+vars <- colnames(first[[1]])[2:ncol(first[[1]])]
+allDiffs <- lapply(vars, getDiffs)
+names(allDiffs) <- vars
+
+
+for(y in names(allDiffs)) {
+	plot(allDiffs[[y]]$year, allDiffs[[y]]$diff, main=y)
+	set.seed(20130318)
+	plot(jitter(as.integer(allDiffs[[y]]$year)), allDiffs[[y]]$diff, main=y)
+}
+
+## We can see how the variables have different patterns over the years.
+## For example, oPassYdsAtt decreases in variability over the years, but dInt increases
+
+```
+
+
+```{r teamA, dependson="setup", warning=FALSE, fig.width=9, fig.height=9, out.width="700px", out.height="700px"}
+## Next, I show huge scatterplot matrices for teamA and then for team B
+
+## teamA first
+for(y in c("2002", "2012")){
+	scatterplotMatrix(~ win + halfdiff + date + teamAoPassYdsAtt + teamAoInt + teamAoRun + teamAoFumble + teamApen + teamAdPassYdsAtt + teamAdRunAtt + teamAdInt + gameA + gwrA, data=gameFirst[[y]], reg.line=FALSE, spread=FALSE, main=y)
+}
+```
+
+```{r teamB, dependson="setup", warning=FALSE, fig.width=9, fig.height=9, out.width="700px", out.height="700px"}
+## teamB
+for(y in c("2002", "2012")){
+	scatterplotMatrix(~ win + halfdiff + date + teamBoPassYdsAtt + teamBoInt + teamBoRun + teamBoFumble + teamBpen + teamBdPassYdsAtt + teamBdRunAtt + teamBdInt + gameB + gwrB, data=gameFirst[[y]], reg.line=FALSE, spread=FALSE, main=y)
+}
+```
+
+
+
+
+```{r lessCrowded, dependson="setup", warning=FALSE}
+
+## Group 2002 to 2011
+gameFi2011 <- do.call(rbind, gameFirst[as.character(2002:2011)])
+scatterplotMatrix(~ win + date + halfdiff + teamAoPassYdsAtt, data=gameFi2011, reg.line=FALSE, spread=FALSE, main="2002 to 2011")
+
+## Use only 2006 to 2011 data as 2002 to 2005 is quite different
+gameFi2011 <- do.call(rbind, gameFirst[as.character(2006:2011)])
+
+summary(gameFi2011)
+
+scatterplotMatrix(~ win + date + halfdiff + teamAoPassYdsAtt, data=gameFi2011, reg.line=FALSE, spread=FALSE, main="2006 to 2011")
+
+scatterplotMatrix(~ win + date + teamAoInt, data=gameFi2011, reg.line=FALSE, spread=FALSE, main="2006 to 2011")
+
+scatterplotMatrix(~ win + teamAoRun, data=gameFi2011, reg.line=FALSE, spread=FALSE, main="2006 to 2011")
+
+scatterplotMatrix(~ win + teamAoFumble, data=gameFi2011, reg.line=FALSE, spread=FALSE, main="2006 to 2011")
+
+scatterplotMatrix(~ win + teamApen, data=gameFi2011, reg.line=FALSE, spread=FALSE, main="2006 to 2011")
+
+scatterplotMatrix(~ win + teamAdPassYdsAtt, data=gameFi2011, reg.line=FALSE, spread=FALSE, main="2006 to 2011")
+
+scatterplotMatrix(~ win + teamAdRunAtt, data=gameFi2011, reg.line=FALSE, spread=FALSE, main="2006 to 2011")
+
+scatterplotMatrix(~ win + teamAdInt, data=gameFi2011, reg.line=FALSE, spread=FALSE, main="2006 to 2011")
+
+scatterplotMatrix(~ win + gameA + gwrA + gwrB, data=gameFi2011, reg.line=FALSE, spread=FALSE, main="2006 to 2011")
+
+```
+
+
+
+

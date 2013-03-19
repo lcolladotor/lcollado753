@@ -12,6 +12,7 @@ Order of scripts
 # EDA
 
 1. EDA/initial/initialEDA.html [View html file](http://htmlpreview.github.com/?https://github.com/lcolladotor/lcollado753/blob/master/final/nfl_half/EDA/initial/initialEDA.html)
+2. EDA/model/modelEDA.html [View html file](http://htmlpreview.github.com/?https://github.com/lcolladotor/lcollado753/blob/master/final/nfl_half/EDA/model/modelEDA.html)
 
 # Report
 
