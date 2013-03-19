@@ -74,7 +74,6 @@ abline(a=0, b=1, col="red")
 
 ```{r brianWay, dependson=c("setup", "step", "pred")}
 
-idx <- rep(c(TRUE, FALSE), nrow(info2012)/2)
 ilogit <- function(x) { exp(x)/(1+exp(x))}
 paired <- sapply(which(idx), function(i) {
 	logitA <- predict(fitStep, newdata=info2012[i, ])
@@ -160,6 +159,30 @@ abline(a=0, b=1, col="red")
 
 
 Ok, now it looks like I got this right.
+
+```{r export, dependson=c("setup", "step")}
+## Re-train a model now with 2006 to 2012 data for predicting 2013 games
+
+## Specify data to use when to train the model
+gameFi2012 <- do.call(rbind, gameFirst[as.character(2006:2012)])
+
+## Transform to factors so glm() won't complain
+gameFi2012$teamA <- as.factor(gameFi2012$teamA)
+gameFi2012$teamB <- as.factor(gameFi2012$teamB)
+
+f2013 <- glm(win ~ teamAoPassYdsAtt + teamAoRun + teamAdPassYdsAtt + 
+    teamAdRunAtt + teamBoRun + teamBoFumble + teamBdRunAtt + 
+    local + halfdiff + resumes + gwrA + gwrB, family = binomial, 
+    data = gameFi2012)
+	
+## Lets look at it
+summary(f2013)
+
+## Save the trained models
+fits <- list("2012"=fitStep, "2013"=f2013)
+save(fits, file="fits.Rdata")
+```
+
 
 
 

@@ -225,7 +225,6 @@ abline(a = 0, b = 1, col = "red")
 
 ```r
 
-idx <- rep(c(TRUE, FALSE), nrow(info2012)/2)
 ilogit <- function(x) {
     exp(x)/(1 + exp(x))
 }
@@ -380,6 +379,74 @@ abline(a = 0, b = 1, col = "red")
 
 
 Ok, now it looks like I got this right.
+
+
+```r
+## Re-train a model now with 2006 to 2012 data for predicting 2013 games
+
+## Specify data to use when to train the model
+gameFi2012 <- do.call(rbind, gameFirst[as.character(2006:2012)])
+
+## Transform to factors so glm() won't complain
+gameFi2012$teamA <- as.factor(gameFi2012$teamA)
+gameFi2012$teamB <- as.factor(gameFi2012$teamB)
+
+f2013 <- glm(win ~ teamAoPassYdsAtt + teamAoRun + teamAdPassYdsAtt + teamAdRunAtt + 
+    teamBoRun + teamBoFumble + teamBdRunAtt + local + halfdiff + resumes + gwrA + 
+    gwrB, family = binomial, data = gameFi2012)
+
+## Lets look at it
+summary(f2013)
+```
+
+```
+## 
+## Call:
+## glm(formula = win ~ teamAoPassYdsAtt + teamAoRun + teamAdPassYdsAtt + 
+##     teamAdRunAtt + teamBoRun + teamBoFumble + teamBdRunAtt + 
+##     local + halfdiff + resumes + gwrA + gwrB, family = binomial, 
+##     data = gameFi2012)
+## 
+## Deviance Residuals: 
+##    Min      1Q  Median      3Q     Max  
+## -2.737  -0.769   0.220   0.758   2.684  
+## 
+## Coefficients:
+##                  Estimate Std. Error z value Pr(>|z|)    
+## (Intercept)      -1.00691    1.44588   -0.70  0.48618    
+## teamAoPassYdsAtt -0.11907    0.11130   -1.07  0.28469    
+## teamAoRun         6.99838    1.68168    4.16  3.2e-05 ***
+## teamAdPassYdsAtt  0.15090    0.11616    1.30  0.19390    
+## teamAdRunAtt     -0.35006    0.08540   -4.10  4.1e-05 ***
+## teamBoRun        -5.69035    1.65563   -3.44  0.00059 ***
+## teamBoFumble     33.24616   10.14166    3.28  0.00104 ** 
+## teamBdRunAtt      0.33947    0.08445    4.02  5.8e-05 ***
+## localTRUE         0.27142    0.08452    3.21  0.00132 ** 
+## halfdiff          0.14755    0.00558   26.47  < 2e-16 ***
+## resumesTRUE       0.21977    0.08419    2.61  0.00904 ** 
+## gwrA              0.73421    0.15718    4.67  3.0e-06 ***
+## gwrB             -0.77118    0.15927   -4.84  1.3e-06 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 5037.3  on 3645  degrees of freedom
+## Residual deviance: 3456.3  on 3633  degrees of freedom
+##   (64 observations deleted due to missingness)
+## AIC: 3482
+## 
+## Number of Fisher Scoring iterations: 5
+```
+
+```r
+
+## Save the trained models
+fits <- list(`2012` = fitStep, `2013` = f2013)
+save(fits, file = "fits.Rdata")
+```
+
+
 
 
 
