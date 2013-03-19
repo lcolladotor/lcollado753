@@ -4,5 +4,9 @@ nflByHalf.bbl
 nflByHalf.blg
 nflByHalf.run.xml
 nflByHalf.tex
-
+fig-*.pdf
+#	final/nfl_half/report/fig-pred.pdf
+#	final/nfl_half/report/fig-pred1.pdf
+#	final/nfl_half/report/fig-pred2.pdf
+#	final/nfl_half/report/fig-scatter.pdf
 
