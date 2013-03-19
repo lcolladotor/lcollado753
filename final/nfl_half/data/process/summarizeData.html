@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<!-- saved from url=(0014)about:internet -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+<title>Goal: extract variables to be used when modelling</title>
+
+<style type="text/css">
+body, td {
+   font-family: sans-serif;
+   background-color: white;
+   font-size: 12px;
+   margin: 8px;
+}
+
+tt, code, pre {
+   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+}
+
+h1 { 
+   font-size:2.2em; 
+}
+
+h2 { 
+   font-size:1.8em; 
+}
+
+h3 { 
+   font-size:1.4em; 
+}
+
+h4 { 
+   font-size:1.0em; 
+}
+
+h5 { 
+   font-size:0.9em; 
+}
+
+h6 { 
+   font-size:0.8em; 
+}
+
+a:visited {
+   color: rgb(50%, 0%, 50%);
+}
+
+pre {	
+   margin-top: 0;
+   max-width: 95%;
+   border: 1px solid #ccc;
+   white-space: pre-wrap;
+}
+
+pre code {
+   display: block; padding: 0.5em;
+}
+
+code.r, code.cpp {
+   background-color: #F8F8F8;
+}
+
+table, td, th {
+  border: none;
+}
+
+blockquote {
+   color:#666666;
+   margin:0;
+   padding-left: 1em;
+   border-left: 0.5em #EEE solid;
+}
+
+hr {
+   height: 0px;
+   border-bottom: none;
+   border-top-width: thin;
+   border-top-style: dotted;
+   border-top-color: #999999;
+}
+
+@media print {
+   * { 
+      background: transparent !important; 
+      color: black !important; 
+      filter:none !important; 
+      -ms-filter: none !important; 
+   }
+
+   body { 
+      font-size:12pt; 
+      max-width:100%; 
+   }
+       
+   a, a:visited { 
+      text-decoration: underline; 
+   }
+
+   hr { 
+      visibility: hidden;
+      page-break-before: always;
+   }
+
+   pre, blockquote { 
+      padding-right: 1em; 
+      page-break-inside: avoid; 
+   }
+
+   tr, img { 
+      page-break-inside: avoid; 
+   }
+
+   img { 
+      max-width: 100% !important; 
+   }
+
+   @page :left { 
+      margin: 15mm 20mm 15mm 10mm; 
+   }
+     
+   @page :right { 
+      margin: 15mm 10mm 15mm 20mm; 
+   }
+
+   p, h2, h3 { 
+      orphans: 3; widows: 3; 
+   }
+
+   h2, h3 { 
+      page-break-after: avoid; 
+   }
+}
+</style>
+
+<!-- Styles for R syntax highlighter -->
+<style type="text/css">
+   pre .operator,
+   pre .paren {
+     color: rgb(104, 118, 135)
+   }
+
+   pre .literal {
+     color: rgb(88, 72, 246)
+   }
+
+   pre .number {
+     color: rgb(0, 0, 205);
+   }
+
+   pre .comment {
+     color: rgb(76, 136, 107);
+   }
+
+   pre .keyword {
+     color: rgb(0, 0, 255);
+   }
+
+   pre .identifier {
+     color: rgb(0, 0, 0);
+   }
+
+   pre .string {
+     color: rgb(3, 106, 7);
+   }
+</style>
+
+<!-- R syntax highlighter -->
+<script type="text/javascript">
+var hljs=new function(){function m(p){return p.replace(/&/gm,"&amp;").replace(/</gm,"&lt;")}function f(r,q,p){return RegExp(q,"m"+(r.cI?"i":"")+(p?"g":""))}function b(r){for(var p=0;p<r.childNodes.length;p++){var q=r.childNodes[p];if(q.nodeName=="CODE"){return q}if(!(q.nodeType==3&&q.nodeValue.match(/\s+/))){break}}}function h(t,s){var p="";for(var r=0;r<t.childNodes.length;r++){if(t.childNodes[r].nodeType==3){var q=t.childNodes[r].nodeValue;if(s){q=q.replace(/\n/g,"")}p+=q}else{if(t.childNodes[r].nodeName=="BR"){p+="\n"}else{p+=h(t.childNodes[r])}}}if(/MSIE [678]/.test(navigator.userAgent)){p=p.replace(/\r/g,"\n")}return p}function a(s){var r=s.className.split(/\s+/);r=r.concat(s.parentNode.className.split(/\s+/));for(var q=0;q<r.length;q++){var p=r[q].replace(/^language-/,"");if(e[p]){return p}}}function c(q){var p=[];(function(s,t){for(var r=0;r<s.childNodes.length;r++){if(s.childNodes[r].nodeType==3){t+=s.childNodes[r].nodeValue.length}else{if(s.childNodes[r].nodeName=="BR"){t+=1}else{if(s.childNodes[r].nodeType==1){p.push({event:"start",offset:t,node:s.childNodes[r]});t=arguments.callee(s.childNodes[r],t);p.push({event:"stop",offset:t,node:s.childNodes[r]})}}}}return t})(q,0);return p}function k(y,w,x){var q=0;var z="";var s=[];function u(){if(y.length&&w.length){if(y[0].offset!=w[0].offset){return(y[0].offset<w[0].offset)?y:w}else{return w[0].event=="start"?y:w}}else{return y.length?y:w}}function t(D){var A="<"+D.nodeName.toLowerCase();for(var B=0;B<D.attributes.length;B++){var C=D.attributes[B];A+=" "+C.nodeName.toLowerCase();if(C.value!==undefined&&C.value!==false&&C.value!==null){A+='="'+m(C.value)+'"'}}return A+">"}while(y.length||w.length){var v=u().splice(0,1)[0];z+=m(x.substr(q,v.offset-q));q=v.offset;if(v.event=="start"){z+=t(v.node);s.push(v.node)}else{if(v.event=="stop"){var p,r=s.length;do{r--;p=s[r];z+=("</"+p.nodeName.toLowerCase()+">")}while(p!=v.node);s.splice(r,1);while(r<s.length){z+=t(s[r]);r++}}}}return z+m(x.substr(q))}function j(){function q(x,y,v){if(x.compiled){return}var u;var s=[];if(x.k){x.lR=f(y,x.l||hljs.IR,true);for(var w in x.k){if(!x.k.hasOwnProperty(w)){continue}if(x.k[w] instanceof Object){u=x.k[w]}else{u=x.k;w="keyword"}for(var r in u){if(!u.hasOwnProperty(r)){continue}x.k[r]=[w,u[r]];s.push(r)}}}if(!v){if(x.bWK){x.b="\\b("+s.join("|")+")\\s"}x.bR=f(y,x.b?x.b:"\\B|\\b");if(!x.e&&!x.eW){x.e="\\B|\\b"}if(x.e){x.eR=f(y,x.e)}}if(x.i){x.iR=f(y,x.i)}if(x.r===undefined){x.r=1}if(!x.c){x.c=[]}x.compiled=true;for(var t=0;t<x.c.length;t++){if(x.c[t]=="self"){x.c[t]=x}q(x.c[t],y,false)}if(x.starts){q(x.starts,y,false)}}for(var p in e){if(!e.hasOwnProperty(p)){continue}q(e[p].dM,e[p],true)}}function d(B,C){if(!j.called){j();j.called=true}function q(r,M){for(var L=0;L<M.c.length;L++){if((M.c[L].bR.exec(r)||[null])[0]==r){return M.c[L]}}}function v(L,r){if(D[L].e&&D[L].eR.test(r)){return 1}if(D[L].eW){var M=v(L-1,r);return M?M+1:0}return 0}function w(r,L){return L.i&&L.iR.test(r)}function K(N,O){var M=[];for(var L=0;L<N.c.length;L++){M.push(N.c[L].b)}var r=D.length-1;do{if(D[r].e){M.push(D[r].e)}r--}while(D[r+1].eW);if(N.i){M.push(N.i)}return f(O,M.join("|"),true)}function p(M,L){var N=D[D.length-1];if(!N.t){N.t=K(N,E)}N.t.lastIndex=L;var r=N.t.exec(M);return r?[M.substr(L,r.index-L),r[0],false]:[M.substr(L),"",true]}function z(N,r){var L=E.cI?r[0].toLowerCase():r[0];var M=N.k[L];if(M&&M instanceof Array){return M}return false}function F(L,P){L=m(L);if(!P.k){return L}var r="";var O=0;P.lR.lastIndex=0;var M=P.lR.exec(L);while(M){r+=L.substr(O,M.index-O);var N=z(P,M);if(N){x+=N[1];r+='<span class="'+N[0]+'">'+M[0]+"</span>"}else{r+=M[0]}O=P.lR.lastIndex;M=P.lR.exec(L)}return r+L.substr(O,L.length-O)}function J(L,M){if(M.sL&&e[M.sL]){var r=d(M.sL,L);x+=r.keyword_count;return r.value}else{return F(L,M)}}function I(M,r){var L=M.cN?'<span class="'+M.cN+'">':"";if(M.rB){y+=L;M.buffer=""}else{if(M.eB){y+=m(r)+L;M.buffer=""}else{y+=L;M.buffer=r}}D.push(M);A+=M.r}function G(N,M,Q){var R=D[D.length-1];if(Q){y+=J(R.buffer+N,R);return false}var P=q(M,R);if(P){y+=J(R.buffer+N,R);I(P,M);return P.rB}var L=v(D.length-1,M);if(L){var O=R.cN?"</span>":"";if(R.rE){y+=J(R.buffer+N,R)+O}else{if(R.eE){y+=J(R.buffer+N,R)+O+m(M)}else{y+=J(R.buffer+N+M,R)+O}}while(L>1){O=D[D.length-2].cN?"</span>":"";y+=O;L--;D.length--}var r=D[D.length-1];D.length--;D[D.length-1].buffer="";if(r.starts){I(r.starts,"")}return R.rE}if(w(M,R)){throw"Illegal"}}var E=e[B];var D=[E.dM];var A=0;var x=0;var y="";try{var s,u=0;E.dM.buffer="";do{s=p(C,u);var t=G(s[0],s[1],s[2]);u+=s[0].length;if(!t){u+=s[1].length}}while(!s[2]);if(D.length>1){throw"Illegal"}return{r:A,keyword_count:x,value:y}}catch(H){if(H=="Illegal"){return{r:0,keyword_count:0,value:m(C)}}else{throw H}}}function g(t){var p={keyword_count:0,r:0,value:m(t)};var r=p;for(var q in e){if(!e.hasOwnProperty(q)){continue}var s=d(q,t);s.language=q;if(s.keyword_count+s.r>r.keyword_count+r.r){r=s}if(s.keyword_count+s.r>p.keyword_count+p.r){r=p;p=s}}if(r.language){p.second_best=r}return p}function i(r,q,p){if(q){r=r.replace(/^((<[^>]+>|\t)+)/gm,function(t,w,v,u){return w.replace(/\t/g,q)})}if(p){r=r.replace(/\n/g,"<br>")}return r}function n(t,w,r){var x=h(t,r);var v=a(t);var y,s;if(v){y=d(v,x)}else{return}var q=c(t);if(q.length){s=document.createElement("pre");s.innerHTML=y.value;y.value=k(q,c(s),x)}y.value=i(y.value,w,r);var u=t.className;if(!u.match("(\\s|^)(language-)?"+v+"(\\s|$)")){u=u?(u+" "+v):v}if(/MSIE [678]/.test(navigator.userAgent)&&t.tagName=="CODE"&&t.parentNode.tagName=="PRE"){s=t.parentNode;var p=document.createElement("div");p.innerHTML="<pre><code>"+y.value+"</code></pre>";t=p.firstChild.firstChild;p.firstChild.cN=s.cN;s.parentNode.replaceChild(p.firstChild,s)}else{t.innerHTML=y.value}t.className=u;t.result={language:v,kw:y.keyword_count,re:y.r};if(y.second_best){t.second_best={language:y.second_best.language,kw:y.second_best.keyword_count,re:y.second_best.r}}}function o(){if(o.called){return}o.called=true;var r=document.getElementsByTagName("pre");for(var p=0;p<r.length;p++){var q=b(r[p]);if(q){n(q,hljs.tabReplace)}}}function l(){if(window.addEventListener){window.addEventListener("DOMContentLoaded",o,false);window.addEventListener("load",o,false)}else{if(window.attachEvent){window.attachEvent("onload",o)}else{window.onload=o}}}var e={};this.LANGUAGES=e;this.highlight=d;this.highlightAuto=g;this.fixMarkup=i;this.highlightBlock=n;this.initHighlighting=o;this.initHighlightingOnLoad=l;this.IR="[a-zA-Z][a-zA-Z0-9_]*";this.UIR="[a-zA-Z_][a-zA-Z0-9_]*";this.NR="\\b\\d+(\\.\\d+)?";this.CNR="\\b(0[xX][a-fA-F0-9]+|(\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?)";this.BNR="\\b(0b[01]+)";this.RSR="!|!=|!==|%|%=|&|&&|&=|\\*|\\*=|\\+|\\+=|,|\\.|-|-=|/|/=|:|;|<|<<|<<=|<=|=|==|===|>|>=|>>|>>=|>>>|>>>=|\\?|\\[|\\{|\\(|\\^|\\^=|\\||\\|=|\\|\\||~";this.ER="(?![\\s\\S])";this.BE={b:"\\\\.",r:0};this.ASM={cN:"string",b:"'",e:"'",i:"\\n",c:[this.BE],r:0};this.QSM={cN:"string",b:'"',e:'"',i:"\\n",c:[this.BE],r:0};this.CLCM={cN:"comment",b:"//",e:"$"};this.CBLCLM={cN:"comment",b:"/\\*",e:"\\*/"};this.HCM={cN:"comment",b:"#",e:"$"};this.NM={cN:"number",b:this.NR,r:0};this.CNM={cN:"number",b:this.CNR,r:0};this.BNM={cN:"number",b:this.BNR,r:0};this.inherit=function(r,s){var p={};for(var q in r){p[q]=r[q]}if(s){for(var q in s){p[q]=s[q]}}return p}}();hljs.LANGUAGES.cpp=function(){var a={keyword:{"false":1,"int":1,"float":1,"while":1,"private":1,"char":1,"catch":1,"export":1,virtual:1,operator:2,sizeof:2,dynamic_cast:2,typedef:2,const_cast:2,"const":1,struct:1,"for":1,static_cast:2,union:1,namespace:1,unsigned:1,"long":1,"throw":1,"volatile":2,"static":1,"protected":1,bool:1,template:1,mutable:1,"if":1,"public":1,friend:2,"do":1,"return":1,"goto":1,auto:1,"void":2,"enum":1,"else":1,"break":1,"new":1,extern:1,using:1,"true":1,"class":1,asm:1,"case":1,typeid:1,"short":1,reinterpret_cast:2,"default":1,"double":1,register:1,explicit:1,signed:1,typename:1,"try":1,"this":1,"switch":1,"continue":1,wchar_t:1,inline:1,"delete":1,alignof:1,char16_t:1,char32_t:1,constexpr:1,decltype:1,noexcept:1,nullptr:1,static_assert:1,thread_local:1,restrict:1,_Bool:1,complex:1},built_in:{std:1,string:1,cin:1,cout:1,cerr:1,clog:1,stringstream:1,istringstream:1,ostringstream:1,auto_ptr:1,deque:1,list:1,queue:1,stack:1,vector:1,map:1,set:1,bitset:1,multiset:1,multimap:1,unordered_set:1,unordered_map:1,unordered_multiset:1,unordered_multimap:1,array:1,shared_ptr:1}};return{dM:{k:a,i:"</",c:[hljs.CLCM,hljs.CBLCLM,hljs.QSM,{cN:"string",b:"'\\\\?.",e:"'",i:"."},{cN:"number",b:"\\b(\\d+(\\.\\d*)?|\\.\\d+)(u|U|l|L|ul|UL|f|F)"},hljs.CNM,{cN:"preprocessor",b:"#",e:"$"},{cN:"stl_container",b:"\\b(deque|list|queue|stack|vector|map|set|bitset|multiset|multimap|unordered_map|unordered_set|unordered_multiset|unordered_multimap|array)\\s*<",e:">",k:a,r:10,c:["self"]}]}}}();hljs.LANGUAGES.r={dM:{c:[hljs.HCM,{cN:"number",b:"\\b0[xX][0-9a-fA-F]+[Li]?\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"number",b:"\\b\\d+(?:[eE][+\\-]?\\d*)?L\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"number",b:"\\b\\d+\\.(?!\\d)(?:i\\b)?",e:hljs.IMMEDIATE_RE,r:1},{cN:"number",b:"\\b\\d+(?:\\.\\d*)?(?:[eE][+\\-]?\\d*)?i?\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"number",b:"\\.\\d+(?:[eE][+\\-]?\\d*)?i?\\b",e:hljs.IMMEDIATE_RE,r:1},{cN:"keyword",b:"(?:tryCatch|library|setGeneric|setGroupGeneric)\\b",e:hljs.IMMEDIATE_RE,r:10},{cN:"keyword",b:"\\.\\.\\.",e:hljs.IMMEDIATE_RE,r:10},{cN:"keyword",b:"\\.\\.\\d+(?![\\w.])",e:hljs.IMMEDIATE_RE,r:10},{cN:"keyword",b:"\\b(?:function)",e:hljs.IMMEDIATE_RE,r:2},{cN:"keyword",b:"(?:if|in|break|next|repeat|else|for|return|switch|while|try|stop|warning|require|attach|detach|source|setMethod|setClass)\\b",e:hljs.IMMEDIATE_RE,r:1},{cN:"literal",b:"(?:NA|NA_integer_|NA_real_|NA_character_|NA_complex_)\\b",e:hljs.IMMEDIATE_RE,r:10},{cN:"literal",b:"(?:NULL|TRUE|FALSE|T|F|Inf|NaN)\\b",e:hljs.IMMEDIATE_RE,r:1},{cN:"identifier",b:"[a-zA-Z.][a-zA-Z0-9._]*\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"operator",b:"<\\-(?!\\s*\\d)",e:hljs.IMMEDIATE_RE,r:2},{cN:"operator",b:"\\->|<\\-",e:hljs.IMMEDIATE_RE,r:1},{cN:"operator",b:"%%|~",e:hljs.IMMEDIATE_RE},{cN:"operator",b:">=|<=|==|!=|\\|\\||&&|=|\\+|\\-|\\*|/|\\^|>|<|!|&|\\||\\$|:",e:hljs.IMMEDIATE_RE,r:0},{cN:"operator",b:"%",e:"%",i:"\\n",r:1},{cN:"identifier",b:"`",e:"`",r:0},{cN:"string",b:'"',e:'"',c:[hljs.BE],r:0},{cN:"string",b:"'",e:"'",c:[hljs.BE],r:0},{cN:"paren",b:"[[({\\])}]",e:hljs.IMMEDIATE_RE,r:0}]}};
+hljs.initHighlightingOnLoad();
+</script>
+
+<!-- MathJax scripts -->
+<script type="text/javascript" src="https://c328740.ssl.cf1.rackcdn.com/mathjax/2.0-latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+</head>
+
+<body>
+<h1>Goal: extract variables to be used when modelling</h1>
+
+<pre><code class="r">opts_chunk$set(cache = FALSE)
+</code></pre>
+
+<pre><code class="r">## Load data directory information
+load(&quot;../download/data-info.Rdata&quot;)
+
+## Get the file names
+files &lt;- list.files(dataDir, pattern = &quot;csv&quot;, full.names = TRUE)
+names(files) &lt;- substr(gsub(&quot;.*/&quot;, &quot;&quot;, files), 1, 4)
+
+## Define the function that will read the data for one year and process
+## some variables on the play by play scale
+readPBP &lt;- function(file, verbose = TRUE) {
+
+    if (FALSE) {
+        file &lt;- files[1]
+        verbose &lt;- TRUE
+    }
+
+    ## Read the file
+    if (verbose) 
+        message(paste(&quot;Reading file&quot;, file))
+    new &lt;- read.csv(file, header = TRUE, stringsAsFactors = FALSE)
+
+
+
+    ## Classify plays
+    type &lt;- rep(NA, nrow(new))
+    if (verbose) 
+        message(&quot;Classifying play types&quot;)
+
+    ## Challenge plays are more complicated. Some are reversed, some are
+    ## upheld
+    challenge &lt;- grep(&quot;challenged&quot;, new$description, ignore.case = TRUE)
+
+    ## For challenge plays that are reversed, remove the initial play
+    ## description
+    reversed &lt;- grep(&quot;reversed&quot;, new$description, ignore.case = TRUE)
+    tochange &lt;- challenge[challenge %in% reversed]
+    new$description[tochange] &lt;- gsub(&quot;.*(REVERSED|reversed).&quot;, &quot;&quot;, new$description[tochange])
+
+    ## Find penalty plays
+    penalty &lt;- grep(&quot;PENALTY&quot;, new$description, ignore.case = TRUE)
+
+    ## For penalty plays where &#39;No Play&#39; is ruled, remove the play description
+    ## prior to the penalty
+    noplay &lt;- grep(&quot;No Play&quot;, new$description)
+    tochange &lt;- penalty[penalty %in% noplay]
+    new$description[tochange] &lt;- gsub(&quot;.*PENALTY&quot;, &quot;&quot;, new$description[tochange])
+
+
+    ## Find the kick off
+    gameid &lt;- unique(new$gameid)
+    kickoff &lt;- unlist(sapply(gameid, function(x) {
+        first &lt;- which(new$gameid == x)[1]
+        is.kick &lt;- grepl(&quot;kicks&quot;, new$description[first])
+        if (is.kick) {
+            res &lt;- first
+        } else {
+            res &lt;- NULL
+        }
+        return(res)
+    }))
+
+    ## Some miscellaneous plays (kicks, fgs, extra points)
+    misc &lt;- which(is.na(new$down) &amp; is.na(new$togo))
+    misc &lt;- misc[!misc %in% kickoff]
+
+    ## Find kicks, punts
+    punt &lt;- grep(&quot;punt&quot;, new$description)
+    ## Do not count as a kick when they actually punted (like 4 cases)
+    kick &lt;- misc[grep(&quot;kicks&quot;, new$description[misc])]
+    kick &lt;- kick[!kick %in% punt]
+
+
+    ## Find extra point attempts
+    extrapt &lt;- misc[grep(&quot;extra point&quot;, new$description[misc])]
+    ## An extra point mentioned on a &#39;kicks&#39; is a kick. Sometimes they comment
+    ## on penalties from extra points on kick descriptions
+    extrapt &lt;- extrapt[!extrapt %in% kick]
+
+    ## Find two point conversion attempts
+    twopts &lt;- misc[grep(&quot;TWO-POINT&quot;, new$description[misc])]
+
+    ## Check what is left of the misc plays
+    if (length(misc) - length(unique(c(kick, extrapt, twopts))) &gt; 0) {
+        weird &lt;- misc[!misc %in% c(kick, extrapt, twopts)]
+        weird &lt;- weird[!weird %in% penalty]
+    }
+
+    ## Find sacks, interceptions, fumbles
+    int &lt;- grep(&quot;INTERCEPTED&quot;, new$description)
+    sack &lt;- grep(&quot;sacked&quot;, new$description)
+    fumble &lt;- grep(&quot;FUMBLES&quot;, new$description)
+
+    ## Find pass attemps
+    ipass &lt;- grep(&quot;pass incomplete&quot;, new$description)
+    # Consider punts those that were punts and then the returning team
+    # attempts a pass
+    ipass &lt;- ipass[!ipass %in% punt]
+    ipass &lt;- c(ipass, twopts[twopts %in% grep(&quot;is incomplete&quot;, new$description)])
+    ## Do not count as incomplete passes those that get intercepted
+    ipass &lt;- ipass[!ipass %in% int]
+    cpass &lt;- grep(&quot;pass to &quot;, new$description)
+
+
+    ## Find field goal attempts
+    fg &lt;- grep(&quot;field goal&quot;, new$description)
+    ## Remove fake field goals
+    fg &lt;- fg[!fg %in% grep(&quot;fake field goal&quot;, new$description, ignore.case = TRUE)]
+    ## Note a fg can&#39;t be an extra point
+    fg &lt;- fg[!fg %in% extrapt]
+    ## Fg and punt can&#39;t go together. Sometimes they line up to FG and then
+    ## punt, so it&#39;s a punt
+    fg &lt;- fg[!fg %in% punt]
+    ## Don&#39;t count as a fg cases where they line up to FG and then pass
+    fg &lt;- fg[!fg %in% ipass &amp; !fg %in% cpass]
+
+    ## Define which are actually good and those missed/blocked
+    fgma &lt;- fg[grep(&quot;GOOD&quot;, new$description[fg])]
+    fgmi &lt;- fg[!fg %in% fgma]
+
+
+
+
+
+    ## Find kneels
+    kneel &lt;- grep(&quot;kneels&quot;, new$description)
+
+    ## Save play-type results maybe use paste(, sep=&#39;|&#39;) then table() to see
+    ## which overlap. Like kick and penalty
+    type[kickoff] &lt;- &quot;kickoff&quot;
+    type[kick] &lt;- &quot;kick&quot;
+    type[punt] &lt;- &quot;punt&quot;
+    type[fgma] &lt;- &quot;made-fg&quot;
+    type[fgmi] &lt;- &quot;missed-fg&quot;
+    type[extrapt] &lt;- &quot;extrapoint&quot;
+    type[cpass] &lt;- &quot;complete-pass&quot;
+
+    ## Give priority to incomplete passes over complete passes. Can happen
+    ## when there is a pass followed by an incomplete pass on the same play
+    type[ipass] &lt;- &quot;incomplete-pass&quot;
+
+    # Interception status takes priority over cpass, ipass descriptions
+    type[int] &lt;- &quot;interception&quot;
+
+    ## Sack and kneels
+    type[sack] &lt;- &quot;sack&quot;
+    type[kneel] &lt;- &quot;kneel&quot;
+    # on-side kick?
+
+    ## Check for any unexpected cases
+    test &lt;- table(c(kickoff, kick, punt, fgma, fgmi, extrapt, ipass, int, kneel))
+    if (sum(test &gt; 1) &gt; 0) {
+        warning(paste(sum(test &gt; 1), &quot;cases where there is an unexpected overlap in file&quot;, 
+            file, &quot;Check rows&quot;, paste(names(test)[test &gt; 1], collapse = &quot;,&quot;)))
+    }
+
+    ## Find anything weird left
+    type[is.na(type) &amp; (new$description == &quot;(2:00)&quot; | new$description == &quot; &quot;)] &lt;- &quot;ignorable&quot;
+
+    ## Assign remaining as runs
+    run &lt;- is.na(type)
+    type[run] &lt;- &quot;run&quot;
+
+    ## Check
+    check &lt;- nrow(new) - sum(!is.na(type)) == 0
+    if (!check) 
+        warning(&quot;Not all plays have an assigned type.&quot;)
+
+    ## Save play-type into final object.
+    new$type &lt;- type
+
+    ## Specify whether the two point attempt was successful or not
+    twotype &lt;- rep(NA, rep(nrow(new)))
+    twotype[twopts] &lt;- &quot;succeed&quot;
+    twotype[twopts[twopts %in% grep(&quot;FAILS&quot;, new$description)]] &lt;- &quot;fail&quot;
+    new$twotype &lt;- twotype
+
+    ## Fumble type: regular fumble, fumble and sack, fumble and other plays
+    ## (kicks, interceptions which are then fumbled, ...)
+    fumble.type &lt;- rep(NA, rep(nrow(new)))
+    weird &lt;- fumble[fumble %in% c(kickoff, kick, punt, fgma, fgmi, extrapt, 
+        ipass, int, kneel)]
+    fumble.type[fumble] &lt;- &quot;fumble&quot;
+    fumble.type[weird] &lt;- &quot;weird&quot;
+    fumble.type[fumble[fumble %in% sack]] &lt;- &quot;fumble-sack&quot;
+    new$ftype &lt;- fumble.type
+
+    ## Challenge type: Reversed or upheld
+    challenge.type &lt;- rep(NA, rep(nrow(new)))
+    challenge.type[challenge[challenge %in% reversed]] &lt;- &quot;reversed&quot;
+    challenge.type[challenge[!challenge %in% reversed]] &lt;- &quot;upheld&quot;
+
+    ## Penalty type: noplay, play (some have declined penalties, offsetting
+    ## penalties, others are enforced)
+    penalty.type &lt;- rep(NA, rep(nrow(new)))
+    penalty.type[penalty[penalty %in% noplay]] &lt;- &quot;noplay&quot;
+    penalty.type[penalty[!penalty %in% noplay]] &lt;- &quot;play&quot;
+    declined &lt;- grep(&quot;declined&quot;, new$description[which(penalty.type == &quot;play&quot;)])
+    declined &lt;- which(penalty.type == &quot;play&quot;)[declined]
+    penalty.type[declined] &lt;- &quot;declined&quot;
+    offsetting &lt;- grep(&quot;offsetting&quot;, new$description[which(penalty.type %in% 
+        c(&quot;noplay&quot;, &quot;play&quot;))])
+    offsetting &lt;- which(penalty.type %in% c(&quot;noplay&quot;, &quot;play&quot;))[offsetting]
+    penalty.type[offsetting] &lt;- &quot;declined&quot;
+
+    ## Save challenge and penalty types
+    new$ctype &lt;- challenge.type
+    new$ptype &lt;- penalty.type
+
+    #### Yards
+    if (verbose) 
+        message(&quot;Finding passing, rushing and penalty yards&quot;)
+
+    ### Find passing yards
+    cpass &lt;- new$type == &quot;complete-pass&quot;
+    pyds &lt;- rep(NA, sum(cpass))
+
+    ## Plays with any yardage movement
+    r &lt;- regexpr(&quot;for -*([0-9]+) yard&quot;, new$description[cpass])
+    pyds[r &gt; 0] &lt;- as.integer(gsub(&quot;(for | yard)&quot;, &quot;&quot;, regmatches(new$description[cpass], 
+        r)))
+
+    ## Plays with no gain
+    r &lt;- grepl(&quot;for no gain&quot;, new$description[cpass])
+    pyds[r] &lt;- 0
+
+    ## two point attempts. If succeed give 2 yds, if fail, give 0 (might not
+    ## be so punishing)
+    pyds[is.na(pyds) &amp; new$twotype[which(cpass)] == &quot;succeed&quot;] &lt;- 2
+    pyds[is.na(pyds)] &lt;- 0
+
+    ## Save results
+    passyds &lt;- rep(NA, nrow(new))
+    passyds[cpass] &lt;- pyds
+    new$passyds &lt;- passyds
+
+    ### Find sack yds
+    sack &lt;- new$type == &quot;sack&quot;
+    yds &lt;- rep(NA, sum(sack))
+
+    r &lt;- regexpr(&quot;for -*([0-9]+) yard&quot;, new$description[sack])
+    yds[r &gt; 0] &lt;- as.integer(gsub(&quot;(for | yard)&quot;, &quot;&quot;, regmatches(new$description[sack], 
+        r)))
+    ## Remaining ones are sacks on two-point conversions. Since no yardage is
+    ## reported, I&#39;ll leave them as NA
+    sackyds &lt;- rep(NA, nrow(new))
+    sackyds[sack] &lt;- yds
+    new$sackyds &lt;- sackyds
+
+    ### Find rushing yards. Do not consider plays where there was a penalty
+    ### called and no play was determined
+    run &lt;- new$type == &quot;run&quot;
+    runNoPlay &lt;- which(new$ptype[which(run)] == &quot;noplay&quot;)
+    run[which(run)[runNoPlay]] &lt;- FALSE
+
+    yds &lt;- rep(NA, sum(run))
+
+    ## Runs with movement
+    r &lt;- regexpr(&quot;for -*([0-9]+) yard&quot;, new$description[run])
+    yds[r &gt; 0] &lt;- as.integer(gsub(&quot;(for | yard)&quot;, &quot;&quot;, regmatches(new$description[run], 
+        r)))
+
+    ## Runs for no gain
+    r &lt;- grepl(&quot;for no gain&quot;, new$description[run])
+    yds[r &amp; is.na(yds)] &lt;- 0
+
+    ## two point attempts. If succeed give 2 yds, if fail, give 0 (might not
+    ## be so punishing)
+    yds[is.na(yds) &amp; new$twotype[which(run)] == &quot;succeed&quot;] &lt;- 2
+    yds[is.na(yds) &amp; new$twotype[which(run)] == &quot;fail&quot;] &lt;- 0
+
+    ## Remaining &#39;run&#39; plays are either in the weird category or penalties
+    runyds &lt;- rep(NA, nrow(new))
+    runyds[run] &lt;- yds
+    new$runyds &lt;- runyds
+
+    ### Find penalty yards
+    pen &lt;- new$ptype %in% c(&quot;noplay&quot;, &quot;play&quot;)
+    yds &lt;- rep(NA, sum(pen))
+
+    ## Penalties with some yrds enforced
+    r &lt;- regexpr(&quot;([0-9]+) yard(s*)(\\s+)enforced&quot;, new$description[pen])
+    yds[r &gt; 0] &lt;- as.integer(gsub(&quot;( yard(s*)(\\s+)enforced)&quot;, &quot;&quot;, regmatches(new$description[pen], 
+        r)))
+
+    ## Penalties enforced with weird coding
+    r &lt;- regexpr(&quot;; ([0-9]+) yard(s*)&amp;&quot;, new$description[pen])
+    if (sum(r &gt; 0) &gt; 0) {
+        yds[r &gt; 0] &lt;- as.integer(gsub(&quot;(; | yard(s*)&amp;)&quot;, &quot;&quot;, regmatches(new$description[pen], 
+            r)))
+    }
+
+    penyds &lt;- rep(NA, nrow(new))
+    penyds[pen] &lt;- yds
+    new$penyds &lt;- penyds
+
+    ### Who got penalized? Offense or defense?
+    i &lt;- which(!is.na(new$penyds))
+    r &lt;- regexpr(&quot; on ([A-Z]+)[-| ]&quot;, new$description[i])
+    whop &lt;- gsub(&quot;( on |[-| ])&quot;, &quot;&quot;, regmatches(new$description[i], r))
+    teamp &lt;- rep(&quot;def&quot;, length(i))
+    teamp[new$off[i] == whop] &lt;- &quot;off&quot;
+
+    ## Save result
+    team.pen &lt;- rep(NA, nrow(new))
+    team.pen[i] &lt;- teamp
+    new$teamp &lt;- team.pen
+
+
+
+
+    ### Find running success
+
+    ## Consider run plays where there is no penalty. Only a small subset are
+    ## runs and have penalties Simarly, ignore run plays where there was a
+    ## fumble
+    i &lt;- which(!is.na(new$runyds) &amp; is.na(new$penyds) &amp; is.na(new$ftype))
+    runsucc &lt;- sapply(i, function(x) {
+        if (new$down[x] %in% 1:3) {
+            res &lt;- ifelse(new$runyds[x] &gt; 0, TRUE, FALSE)
+        } else {
+            res &lt;- ifelse(new$togo[x] - new$runyds[x] &lt;= 0, TRUE, FALSE)
+        }
+        return(res)
+    })
+    run.good &lt;- rep(NA, nrow(new))
+    run.good[i] &lt;- runsucc
+    new$rsucc &lt;- run.good
+
+
+    ## Done
+    return(new)
+}
+
+## Read data
+data &lt;- lapply(files, readPBP)
+</code></pre>
+
+<pre><code>## Reading file /Users/lcollado/Google Drive/NFL/2002_nfl_pbp_data.csv
+</code></pre>
+
+<pre><code>## Classifying play types
+</code></pre>
+
+<pre><code>## Finding passing, rushing and penalty yards
+</code></pre>
+
+<pre><code>## Reading file /Users/lcollado/Google Drive/NFL/2003_nfl_pbp_data.csv
+</code></pre>
+
+<pre><code>## Classifying play types
+</code></pre>
+
+<pre><code>## Finding passing, rushing and penalty yards
+</code></pre>
+
+<pre><code>## Reading file /Users/lcollado/Google Drive/NFL/2004_nfl_pbp_data.csv
+</code></pre>
+
+<pre><code>## Classifying play types
+</code></pre>
+
+<pre><code>## Finding passing, rushing and penalty yards
+</code></pre>
+
+<pre><code>## Reading file /Users/lcollado/Google Drive/NFL/2005_nfl_pbp_data.csv
+</code></pre>
+
+<pre><code>## Classifying play types
+</code></pre>
+
+<pre><code>## Finding passing, rushing and penalty yards
+</code></pre>
+
+<pre><code>## Reading file /Users/lcollado/Google Drive/NFL/2006_nfl_pbp_data.csv
+</code></pre>
+
+<pre><code>## Classifying play types
+</code></pre>
+
+<pre><code>## Finding passing, rushing and penalty yards
+</code></pre>
+
+<pre><code>## Reading file /Users/lcollado/Google Drive/NFL/2007_nfl_pbp_data.csv
+</code></pre>
+
+<pre><code>## Classifying play types
+</code></pre>
+
+<pre><code>## Finding passing, rushing and penalty yards
+</code></pre>
+
+<pre><code>## Reading file /Users/lcollado/Google Drive/NFL/2008_nfl_pbp_data.csv
+</code></pre>
+
+<pre><code>## Classifying play types
+</code></pre>
+
+<pre><code>## Finding passing, rushing and penalty yards
+</code></pre>
+
+<pre><code>## Reading file /Users/lcollado/Google Drive/NFL/2009_nfl_pbp_data.csv
+</code></pre>
+
+<pre><code>## Classifying play types
+</code></pre>
+
+<pre><code>## Finding passing, rushing and penalty yards
+</code></pre>
+
+<pre><code>## Reading file /Users/lcollado/Google Drive/NFL/2010_nfl_pbp_data.csv
+</code></pre>
+
+<pre><code>## Classifying play types
+</code></pre>
+
+<pre><code>## Finding passing, rushing and penalty yards
+</code></pre>
+
+<pre><code>## Reading file /Users/lcollado/Google Drive/NFL/2011_nfl_pbp_data.csv
+</code></pre>
+
+<pre><code>## Classifying play types
+</code></pre>
+
+<pre><code>## Finding passing, rushing and penalty yards
+</code></pre>
+
+<pre><code>## Reading file /Users/lcollado/Google
+## Drive/NFL/2012_nfl_pbp_data_reg_season.csv
+</code></pre>
+
+<pre><code>## Classifying play types
+</code></pre>
+
+<pre><code>## Finding passing, rushing and penalty yards
+</code></pre>
+
+<pre><code class="r">
+## Check how big it is in mem
+print(object.size(data), units = &quot;Mb&quot;)
+</code></pre>
+
+<pre><code>## 134.5 Mb
+</code></pre>
+
+<pre><code class="r">
+## Save data (12.4 mb)
+save(data, file = &quot;data.Rdata&quot;, compress = &quot;gzip&quot;)
+</code></pre>
+
+<p>Now that I have finally read in the data, I can now calculate the team stats per year</p>
+
+<pre><code class="r">
+getTeamStats &lt;- function(team, df, half) {
+
+    if (FALSE) {
+        df &lt;- data[[&quot;2002&quot;]]
+        team &lt;- &quot;GB&quot;
+        half &lt;- &quot;first&quot;
+    }
+    if (!half %in% c(&quot;first&quot;, &quot;second&quot;, &quot;full&quot;)) 
+        error(&quot;&#39;half&#39; must be &#39;first&#39;, &#39;second&#39;, or &#39;full&#39;&quot;)
+
+    if (half == &quot;first&quot;) {
+        qtrs &lt;- c(1, 2)
+    } else if (half == &quot;second&quot;) {
+        qtrs &lt;- c(3, 4)
+    } else {
+        qtrs &lt;- c(1:4)
+    }
+    df &lt;- subset(df, qtr %in% qtrs)
+
+    ## Working data subsets for team of interest
+    off &lt;- subset(df, off == team)
+    rownames(off) &lt;- 1:nrow(off)
+
+    def &lt;- subset(df, def == team)
+    rownames(def) &lt;- 1:nrow(def)
+
+    ## Define passing attempts
+    passAtt &lt;- which(!is.na(off$passyds) | off$type == &quot;interception&quot; | off$type == 
+        &quot;incomplete-pass&quot; | off$type == &quot;sack&quot;)
+
+    ## Find net passing yards per attempt
+    netPassYds &lt;- (sum(off$passyds, na.rm = TRUE) - sum(off$sackyds, na.rm = TRUE))/length(passAtt)
+
+    ## Find offensive interceptions per attempt
+    offInt &lt;- length(which(off$type == &quot;interception&quot;))/length(passAtt)
+
+    ## Find running success rate
+    runSucc &lt;- sum(off$rsucc == TRUE, na.rm = TRUE)/length(!is.na(off$rsucc))
+
+    ## Find offensive fumbles per attempt
+    offAtt &lt;- length(passAtt) + length(!is.na(off$rsucc))
+    fumble &lt;- sum(off$ftype %in% c(&quot;fumble&quot;, &quot;fumble-sack&quot;))/offAtt
+
+    ## Find team penalty yards per play
+    penalty &lt;- (sum(off$penyds[which(off$teamp == &quot;off&quot;)]) + sum(def$penyds[which(def$teamp == 
+        &quot;def&quot;)]))/(nrow(off) + nrow(def))
+
+    ## Find defensive net passing yds per attempt
+    defPassAtt &lt;- which(!is.na(def$passyds) | def$type == &quot;interception&quot; | def$type == 
+        &quot;incomplete-pass&quot; | def$type == &quot;sack&quot;)
+    defNetPassYds &lt;- (sum(def$passyds, na.rm = TRUE) - sum(def$sackyds, na.rm = TRUE))/length(defPassAtt)
+
+    ## Find defensive rushing yards per attempt
+    defRushAtt &lt;- which(def$type == &quot;run&quot; | def$ftype == &quot;fumble&quot;)
+    defRushYds &lt;- sum(def$runyds, na.rm = TRUE)/length(defRushAtt)
+
+    ## Find defensive interceptions per attempt
+    defInt &lt;- length(which(def$type == &quot;interception&quot;))/length(defPassAtt)
+
+    ## Construct summary info
+
+    data.frame(team = team, oPassYdsAtt = netPassYds, oInt = offInt, oRun = runSucc, 
+        oFumble = fumble, pen = penalty, dPassYdsAtt = defNetPassYds, dRunAtt = defRushYds, 
+        dInt = defInt)
+}
+
+## List of teams
+teams &lt;- sort(unique(data[[&quot;2012&quot;]]$off))[-1]
+
+## Get the team stats for all teams in all years, first half only
+first &lt;- lapply(data, function(df) {
+    res &lt;- lapply(teams, function(team) {
+        getTeamStats(team, df, half = &quot;first&quot;)
+    })
+    res &lt;- do.call(rbind, res)
+})
+
+## Now do the same for the second half only
+second &lt;- lapply(data, function(df) {
+    res &lt;- lapply(teams, function(team) {
+        getTeamStats(team, df, half = &quot;second&quot;)
+    })
+    res &lt;- do.call(rbind, res)
+})
+
+
+## Finally, for both halfs
+full &lt;- lapply(data, function(df) {
+    res &lt;- lapply(teams, function(team) {
+        getTeamStats(team, df, half = &quot;full&quot;)
+    })
+    res &lt;- do.call(rbind, res)
+})
+
+## Save team summaries
+save(first, file = &quot;first.Rdata&quot;)
+save(second, file = &quot;second.Rdata&quot;)
+save(full, file = &quot;full.Rdata&quot;)
+</code></pre>
+
+<p>Next, I have to summarize the data by game</p>
+
+<pre><code class="r">
+## This function extracts the relevant information for teams A and B
+gameConstruct &lt;- function(teamA, teamB, teamdf, playdf, id, is.local) {
+
+    if (FALSE) {
+        ## For testing
+        id &lt;- gameid[1]
+        teamA &lt;- teams[[1]][1]
+        teamB &lt;- teams[[1]][2]
+        is.local &lt;- FALSE
+    }
+
+    # print(id)
+
+    ## Figure out which was the last play of the game
+    last &lt;- function(x) {
+        x[length(x)]
+    }
+    gamend &lt;- last(which(playdf$gameid == id))
+
+    ## Final score diff
+    scorediff &lt;- playdf$offscore[gamend] - playdf$defscore[gamend]
+
+    if (is.na(scorediff)) {
+        ## Some games are missing the information completely
+        message(paste(&quot;Game&quot;, id, &quot;has no information&quot;))
+        scorediff &lt;- NA
+        win &lt;- NA
+        halfdiff &lt;- NA
+        is.resumes &lt;- NA
+    } else {
+        if (scorediff == 0) {
+            ## Consider a tie a win for both teams
+            win &lt;- TRUE
+        } else {
+            ## Figure out if the team was on the off or def on the last play
+            is.off &lt;- teamA == playdf$off[gamend]
+            ## Assume teamA won
+            win &lt;- TRUE
+            if (is.off &amp; scorediff &lt; 0) {
+                ## Was offensive team, yet the def team had more points
+                win &lt;- FALSE
+            } else if (!is.off &amp; scorediff &gt; 0) {
+                ## Was def team, yet the off team had more points
+                win &lt;- FALSE
+            }
+        }
+
+        ## Figure out the last play of the 1st half
+        halftime &lt;- last(which(playdf$gameid == id &amp; playdf$qtr == 2))
+
+        ## Some games don&#39;t have data on the 2nd quarter!
+        if (length(halftime) == 0) {
+            message(paste(&quot;Game&quot;, id, &quot;has no 2nd quarter data&quot;))
+            halfdiff &lt;- NA
+        } else {
+            ## Figure out the half time score difference (+ means teamA is winning)
+            halfdiff &lt;- playdf$offscore[halftime] - playdf$defscore[halftime]
+            is.off &lt;- teamA == playdf$off[halftime]
+            if (!is.off) {
+                halfdiff &lt;- halfdiff * (-1)
+            }
+        }
+
+        ## TeamA starts 2nd half?  Assume that the 1st play of the 3rd quarter is
+        ## a kick
+        firstq3 &lt;- which(playdf$gameid == id &amp; playdf$qtr == 3)[1] + 1
+        is.resumes &lt;- teamA == playdf$off[firstq3]
+    }
+
+
+    ## Game day
+    date &lt;- as.Date(substr(id, 1, 8), format = &quot;%Y%m%d&quot;)
+
+    ## Merge team stats
+    stats &lt;- data.frame(teamdf[teamdf$team == teamA, 2:ncol(teamdf)], teamdf[teamdf$team == 
+        teamB, 2:ncol(teamdf)])
+    colnames(stats) &lt;- paste0(rep(c(&quot;teamA&quot;, &quot;teamB&quot;), each = ncol(teamdf) - 
+        1), colnames(teamdf)[2:ncol(teamdf)])
+
+    ## Add other info
+    res &lt;- stats
+    res$local &lt;- is.local
+    res$win &lt;- win
+    res$halfdiff &lt;- halfdiff
+    res$date &lt;- date
+    res$resumes &lt;- is.resumes
+    res$teamA &lt;- teamA
+    res$teamB &lt;- teamB
+
+    ## Finish
+    return(res)
+}
+
+## gameSummary extracts all the game summaries for a given pair of team
+## summary and games
+gameSummary &lt;- function(teamdf, playdf) {
+
+    if (FALSE) {
+        ## For testing
+        teamdf &lt;- first[[&quot;2011&quot;]]
+        playdf &lt;- data[[&quot;2011&quot;]]
+        i &lt;- 1
+    }
+
+    ## Ignore weird cases (2 in 2010) of empty rows
+    playdf &lt;- subset(playdf, gameid != &quot;&quot;)
+
+    gameid &lt;- unique(playdf$gameid)
+    teams &lt;- strsplit(gsub(&quot;[0-9]+_&quot;, &quot;&quot;, gameid), &quot;@&quot;)
+
+    res &lt;- lapply(1:length(gameid), function(i) {
+        if (teams[[i]][1] %in% c(&quot;NFC&quot;, &quot;AFC&quot;)) {
+            ## Remove pro-bowl
+            result &lt;- NULL
+        } else {
+            res1 &lt;- gameConstruct(teamA = teams[[i]][1], teamB = teams[[i]][2], 
+                teamdf = teamdf, playdf = playdf, id = gameid[i], is.local = FALSE)
+            res2 &lt;- gameConstruct(teamA = teams[[i]][2], teamB = teams[[i]][1], 
+                teamdf = teamdf, playdf = playdf, id = gameid[i], is.local = TRUE)
+            result &lt;- rbind(res1, res2)
+        }
+        return(result)
+    })
+    res &lt;- do.call(rbind, res)
+    rownames(res) &lt;- 1:nrow(res)
+
+    ## Find game number (no longer week because some teams get to the SB
+    ## through the wildcard round and others don&#39;t)
+    gameA &lt;- sapply(1:nrow(res), function(i) {
+        if (i == 1) {
+            week &lt;- 1
+        } else {
+            week &lt;- sum(res$teamA[1:i] == res$teamA[i])
+        }
+        return(week)
+    })
+
+    gameB &lt;- sapply(1:nrow(res), function(i) {
+        if (i == 1) {
+            week &lt;- 1
+        } else {
+            week &lt;- sum(res$teamB[1:i] == res$teamB[i])
+        }
+        return(week)
+    })
+
+    ## Find game day winning record
+    gwrA &lt;- sapply(1:nrow(res), function(i) {
+        if (gameA[i] == 1) {
+            gwr &lt;- 0
+        } else {
+            gwr &lt;- sum(res$win[which(res$teamA[1:(i - 1)] == res$teamA[i])])/(gameA[i] - 
+                1)
+        }
+        return(gwr)
+    })
+
+    gwrB &lt;- sapply(1:nrow(res), function(i) {
+        if (gameB[i] == 1) {
+            gwr &lt;- 0
+        } else {
+            gwr &lt;- sum(res$win[which(res$teamA[1:(i - 2)] == res$teamB[i])])/(gameB[i] - 
+                1)
+        }
+        return(gwr)
+    })
+
+    ## Add results
+    res$gameA &lt;- gameA
+    res$gwrA &lt;- gwrA
+    res$gameB &lt;- gameB
+    res$gwrB &lt;- gwrB
+
+    ## Finish
+    return(res)
+}
+
+## Build data sets that will be used to train the model
+gameFirst &lt;- lapply(names(first), function(year) {
+    print(paste(&quot;Processing year&quot;, year))
+    gameSummary(first[[year]], data[[year]])
+})
+</code></pre>
+
+<pre><code>## [1] &quot;Processing year 2002&quot;
+</code></pre>
+
+<pre><code>## Game 20020922_CAR@MIN has no 2nd quarter data
+</code></pre>
+
+<pre><code>## Game 20020922_CAR@MIN has no 2nd quarter data
+</code></pre>
+
+<pre><code>## [1] &quot;Processing year 2003&quot;
+</code></pre>
+
+<pre><code>## Game 20040110_CAR@STL has no information
+</code></pre>
+
+<pre><code>## Game 20040110_CAR@STL has no information
+</code></pre>
+
+<pre><code>## Game 20040118_IND@NE has no information
+</code></pre>
+
+<pre><code>## Game 20040118_IND@NE has no information
+</code></pre>
+
+<pre><code>## [1] &quot;Processing year 2004&quot;
+</code></pre>
+
+<pre><code>## Game 20040926_GB@IND has no information
+</code></pre>
+
+<pre><code>## Game 20040926_GB@IND has no information
+</code></pre>
+
+<pre><code>## [1] &quot;Processing year 2005&quot;
+</code></pre>
+
+<pre><code>## Game 20051023_NO@STL has no information
+</code></pre>
+
+<pre><code>## Game 20051023_NO@STL has no information
+</code></pre>
+
+<pre><code>## Game 20051023_DET@CLE has no 2nd quarter data
+</code></pre>
+
+<pre><code>## Game 20051023_DET@CLE has no 2nd quarter data
+</code></pre>
+
+<pre><code>## [1] &quot;Processing year 2006&quot;
+</code></pre>
+
+<pre><code>## Game 20061126_CHI@NE has no information
+</code></pre>
+
+<pre><code>## Game 20061126_CHI@NE has no information
+</code></pre>
+
+<pre><code>## Game 20061127_GB@SEA has no information
+</code></pre>
+
+<pre><code>## Game 20061127_GB@SEA has no information
+</code></pre>
+
+<pre><code>## [1] &quot;Processing year 2007&quot;
+</code></pre>
+
+<pre><code>## Game 20070930_HOU@ATL has no 2nd quarter data
+</code></pre>
+
+<pre><code>## Game 20070930_HOU@ATL has no 2nd quarter data
+</code></pre>
+
+<pre><code>## Game 20071104_CIN@BUF has no 2nd quarter data
+</code></pre>
+
+<pre><code>## Game 20071104_CIN@BUF has no 2nd quarter data
+</code></pre>
+
+<pre><code>## [1] &quot;Processing year 2008&quot;
+</code></pre>
+
+<pre><code>## Game 20081102_NYJ@BUF has no 2nd quarter data
+</code></pre>
+
+<pre><code>## Game 20081102_NYJ@BUF has no 2nd quarter data
+</code></pre>
+
+<pre><code>## [1] &quot;Processing year 2009&quot;
+## [1] &quot;Processing year 2010&quot;
+</code></pre>
+
+<pre><code>## Game 20101125_CIN@NYJ has no 2nd quarter data
+</code></pre>
+
+<pre><code>## Game 20101125_CIN@NYJ has no 2nd quarter data
+</code></pre>
+
+<pre><code>## [1] &quot;Processing year 2011&quot;
+## [1] &quot;Processing year 2012&quot;
+</code></pre>
+
+<pre><code class="r">print(object.size(gameFirst), units = &quot;Mb&quot;)
+</code></pre>
+
+<pre><code>## 1.2 Mb
+</code></pre>
+
+<pre><code class="r">
+gameFull &lt;- lapply(names(full), function(year) {
+    print(paste(&quot;Processing year&quot;, year))
+    gameSummary(full[[year]], data[[year]])
+})
+</code></pre>
+
+<pre><code>## [1] &quot;Processing year 2002&quot;
+</code></pre>
+
+<pre><code>## Game 20020922_CAR@MIN has no 2nd quarter data
+</code></pre>
+
+<pre><code>## Game 20020922_CAR@MIN has no 2nd quarter data
+</code></pre>
+
+<pre><code>## [1] &quot;Processing year 2003&quot;
+</code></pre>
+
+<pre><code>## Game 20040110_CAR@STL has no information
+</code></pre>
+
+<pre><code>## Game 20040110_CAR@STL has no information
+</code></pre>
+
+<pre><code>## Game 20040118_IND@NE has no information
+</code></pre>
+
+<pre><code>## Game 20040118_IND@NE has no information
+</code></pre>
+
+<pre><code>## [1] &quot;Processing year 2004&quot;
+</code></pre>
+
+<pre><code>## Game 20040926_GB@IND has no information
+</code></pre>
+
+<pre><code>## Game 20040926_GB@IND has no information
+</code></pre>
+
+<pre><code>## [1] &quot;Processing year 2005&quot;
+</code></pre>
+
+<pre><code>## Game 20051023_NO@STL has no information
+</code></pre>
+
+<pre><code>## Game 20051023_NO@STL has no information
+</code></pre>
+
+<pre><code>## Game 20051023_DET@CLE has no 2nd quarter data
+</code></pre>
+
+<pre><code>## Game 20051023_DET@CLE has no 2nd quarter data
+</code></pre>
+
+<pre><code>## [1] &quot;Processing year 2006&quot;
+</code></pre>
+
+<pre><code>## Game 20061126_CHI@NE has no information
+</code></pre>
+
+<pre><code>## Game 20061126_CHI@NE has no information
+</code></pre>
+
+<pre><code>## Game 20061127_GB@SEA has no information
+</code></pre>
+
+<pre><code>## Game 20061127_GB@SEA has no information
+</code></pre>
+
+<pre><code>## [1] &quot;Processing year 2007&quot;
+</code></pre>
+
+<pre><code>## Game 20070930_HOU@ATL has no 2nd quarter data
+</code></pre>
+
+<pre><code>## Game 20070930_HOU@ATL has no 2nd quarter data
+</code></pre>
+
+<pre><code>## Game 20071104_CIN@BUF has no 2nd quarter data
+</code></pre>
+
+<pre><code>## Game 20071104_CIN@BUF has no 2nd quarter data
+</code></pre>
+
+<pre><code>## [1] &quot;Processing year 2008&quot;
+</code></pre>
+
+<pre><code>## Game 20081102_NYJ@BUF has no 2nd quarter data
+</code></pre>
+
+<pre><code>## Game 20081102_NYJ@BUF has no 2nd quarter data
+</code></pre>
+
+<pre><code>## [1] &quot;Processing year 2009&quot;
+## [1] &quot;Processing year 2010&quot;
+</code></pre>
+
+<pre><code>## Game 20101125_CIN@NYJ has no 2nd quarter data
+</code></pre>
+
+<pre><code>## Game 20101125_CIN@NYJ has no 2nd quarter data
+</code></pre>
+
+<pre><code>## [1] &quot;Processing year 2011&quot;
+## [1] &quot;Processing year 2012&quot;
+</code></pre>
+
+<pre><code class="r">print(object.size(gameFull), units = &quot;Mb&quot;)
+</code></pre>
+
+<pre><code>## 1.2 Mb
+</code></pre>
+
+<pre><code class="r">
+## Save information
+save(gameFirst, file = &quot;gameFirst.Rdata&quot;, compress = &quot;gzip&quot;)
+save(gameFull, file = &quot;gameFull.Rdata&quot;, compress = &quot;gzip&quot;)
+</code></pre>
+
+</body>
+
+</html>

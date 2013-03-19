@@ -1,0 +1,3 @@
+## Ignore full data due to it's size
+data.Rdata
+
