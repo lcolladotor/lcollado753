@@ -22,3 +22,7 @@ Order of scripts
 # Report
 
 1. report/nflByHalf.Rnw generates report/nflByHalf.pdf
+
+# Post
+
+1. Check [Fellgernon Bit](http://fellgernon.tumblr.com/post/46117939292/predicting-who-will-win-a-nfl-match-at-half-time\#.UU5TDlvF2c4)

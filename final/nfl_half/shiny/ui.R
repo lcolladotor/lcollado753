@@ -42,7 +42,7 @@ shinyUI(pageWithSidebar(
 			tabPanel("Prediction",
 				h4("Game prediction"),
 				textOutput("prediction"),
-				h5(HTML("Full description at <a href='https://github.com/lcolladotor/lcollado753/tree/master/final/nfl_half'>GitHub</a>. Check the report for details or look at the R code."))
+				h5(HTML("Full description at <a href='https://github.com/lcolladotor/lcollado753/tree/master/final/nfl_half'>GitHub</a>. Check the report for details or look at the R code. Post explaining the project at <a href='http://fellgernon.tumblr.com/post/46117939292/predicting-who-will-win-a-nfl-match-at-half-time#.UU5TDlvF2c4'>Fellgernon Bit</a>."))
 			),
 			
 			tabPanel("Model information",
